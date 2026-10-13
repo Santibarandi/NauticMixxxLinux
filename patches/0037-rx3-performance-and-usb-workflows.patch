@@ -2689,7 +2689,7 @@ diff --git a/src/widget/rx3mysettingswriter.h b/src/widget/rx3mysettingswriter.h
 new file mode 100644
 --- /dev/null
 +++ b/src/widget/rx3mysettingswriter.h
-@@ -0,0 +1,56 @@
+@@ -0,0 +1,57 @@
 +#pragma once
 +#include <QFile>
 +#include <QFileInfo>
@@ -2730,14 +2730,15 @@ new file mode 100644
 +    }
 +    if(updated.isEmpty()) return QString("Export MY SETTINGS from rekordbox to this USB before saving.");
 +    auto write=[](const QString& path,const QByteArray& bytes) {if(QFileInfo(path).isSymLink()) return false;QSaveFile file(path);file.setDirectWriteFallback(false);return file.open(QIODevice::WriteOnly) && file.write(bytes)==bytes.size() && file.commit();};
++    // Release the read handle before atomic replacement, including rollback.
++    // Windows does not allow replacing a destination that remains open here.
++    auto matches=[](const QString& path,const QByteArray& bytes) {QFile file(path);return !QFileInfo(path).isSymLink() && file.open(QIODevice::ReadOnly) && file.readAll()==bytes;};
 +    for(auto it=originals.cbegin();it!=originals.cend();++it) if(!sameUsb() || !write(it.key()+".nauticmixxx-settings-backup",it.value())) return QString("Unable to save the USB recovery copy.");
 +    QStringList committed;
 +    for(auto it=updated.cbegin();it!=updated.cend();++it) {
-+        QFile file(it.key());
-+        if(!sameUsb() || QFileInfo(it.key()).isSymLink() || !file.open(QIODevice::ReadOnly) || file.readAll()!=originals[it.key()] || !sameUsb() || !write(it.key(),it.value())) {
++        if(!sameUsb() || !matches(it.key(),originals[it.key()]) || !sameUsb() || !write(it.key(),it.value())) {
 +            for(const auto& path:committed) {
-+                QFile live(path);
-+                if(sameUsb() && !QFileInfo(path).isSymLink() && live.open(QIODevice::ReadOnly) && live.readAll()==updated[path]) write(path,originals[path]);
++                if(sameUsb() && matches(path,updated[path])) write(path,originals[path]);
 +            }
 +            return QString("USB settings changed or could not be saved. Recovery copies retained.");
 +        }
