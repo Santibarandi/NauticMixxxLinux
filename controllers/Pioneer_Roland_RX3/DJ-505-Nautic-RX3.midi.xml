@@ -13,11 +13,12 @@
             <file functionprefix="" filename="midi-components-0.0.js" />
             <file functionprefix="DJ505" filename="Roland_DJ-505-scripts.js" />
             <file functionprefix="NauticRX3Browser" filename="Nautic-RX3-Browser.js" />
+            <file functionprefix="NauticRX3Encoder" filename="Nautic-RX3-Encoder-Pioneer-Roland.js" />
         </scriptfiles>
         <controls>
             <control>
                 <group>[Channel1]</group>
-                <key>DJ505.deck[0].play.input</key>
+                <key>NauticRX3Encoder.play25</key>
                 <description>DECK 1 PLAY/PAUSE</description>
                 <status>0x90</status>
                 <midino>0x00</midino>
@@ -57,7 +58,7 @@
             </control>
             <control>
                 <group>[Channel1]</group>
-                <key>DJ505.deck[0].play.input</key>
+                <key>NauticRX3Encoder.play26</key>
                 <description>DECK 1 STUTTER</description>
                 <status>0x90</status>
                 <midino>0x04</midino>
@@ -718,7 +719,7 @@
             </control>
             <control>
                 <group>[Channel3]</group>
-                <key>DJ505.deck[2].play.input</key>
+                <key>NauticRX3Encoder.play27</key>
                 <description>DECK 3 PLAY/PAUSE</description>
                 <status>0x92</status>
                 <midino>0x00</midino>
@@ -758,7 +759,7 @@
             </control>
             <control>
                 <group>[Channel3]</group>
-                <key>DJ505.deck[2].play.input</key>
+                <key>NauticRX3Encoder.play28</key>
                 <description>DECK 3 STUTTER</description>
                 <status>0x92</status>
                 <midino>0x04</midino>
@@ -1419,7 +1420,7 @@
             </control>
             <control>
                 <group>[Channel2]</group>
-                <key>DJ505.deck[1].play.input</key>
+                <key>NauticRX3Encoder.play29</key>
                 <description>DECK 2 PLAY/PAUSE</description>
                 <status>0x91</status>
                 <midino>0x00</midino>
@@ -1459,7 +1460,7 @@
             </control>
             <control>
                 <group>[Channel2]</group>
-                <key>DJ505.deck[1].play.input</key>
+                <key>NauticRX3Encoder.play30</key>
                 <description>DECK 2 STUTTER</description>
                 <status>0x91</status>
                 <midino>0x04</midino>
@@ -2120,7 +2121,7 @@
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>DJ505.deck[3].play.input</key>
+                <key>NauticRX3Encoder.play31</key>
                 <description>DECK 4 PLAY/PAUSE</description>
                 <status>0x93</status>
                 <midino>0x00</midino>
@@ -2160,7 +2161,7 @@
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>DJ505.deck[3].play.input</key>
+                <key>NauticRX3Encoder.play32</key>
                 <description>DECK 4 STUTTER</description>
                 <status>0x93</status>
                 <midino>0x04</midino>

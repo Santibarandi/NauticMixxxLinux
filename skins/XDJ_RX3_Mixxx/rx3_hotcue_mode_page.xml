@@ -5,6 +5,7 @@
     <Layout>vertical</Layout>
     <Children>
       <Label><ObjectName>RX3ModeTitle</ObjectName><Rx3ModeTitle>true</Rx3ModeTitle><Text><Variable name="title"/></Text><Size>0me,16f</Size></Label>
+      <WidgetGroup><ObjectName>RX3ModeTitleGap</ObjectName><Size>0me,8f</Size></WidgetGroup>
       <WidgetGroup>
         <ObjectName>RX3ModePadRow</ObjectName><Layout>horizontal</Layout><Size>0me,18f</Size>
         <Children>
@@ -14,7 +15,7 @@
           <Template src="skin:rx3_status_hotcue_pad.xml"><SetVariable name="channel"><Variable name="channel"/></SetVariable><SetVariable name="hotcue">4</SetVariable><SetVariable name="label">D</SetVariable></Template>
         </Children>
       </WidgetGroup>
-      <WidgetGroup><ObjectName>RX3ModeRowGap</ObjectName><Size>0me,4f</Size></WidgetGroup>
+      <WidgetGroup><ObjectName>RX3ModeRowGap</ObjectName><Size>0me,10f</Size></WidgetGroup>
       <WidgetGroup>
         <ObjectName>RX3ModePadRow</ObjectName><Layout>horizontal</Layout><Size>0me,18f</Size>
         <Children>
@@ -24,7 +25,6 @@
           <Template src="skin:rx3_status_hotcue_pad.xml"><SetVariable name="channel"><Variable name="channel"/></SetVariable><SetVariable name="hotcue">8</SetVariable><SetVariable name="label">H</SetVariable></Template>
         </Children>
       </WidgetGroup>
-      <WidgetGroup><ObjectName>RX3HotcueBottomSpace</ObjectName><Size>0me,4f</Size></WidgetGroup>
     </Children>
   </WidgetGroup>
 </Template>

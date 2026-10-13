@@ -26,6 +26,7 @@ function fixture(native = true) {
     };
     const context = vm.createContext({engine, Date: {now: () => now}, components: {Deck: function() {}},
         midi: {sendShortMsg() {}}, console});
+    vm.runInContext(fs.readFileSync(path.join(__dirname,"../controllers/Hercules_DJControl_Inpulse_500_RX3/Nautic-RX3-Encoder-Hercules.js"),"utf8"),context);
     vm.runInContext(source, context);
     const m = context.DJCi500;
     m.deckA = {isShiftPressed: false}; m.deckB = {isShiftPressed: false};

@@ -24,11 +24,12 @@ function fixture(native = true) {
         stopTimer(id) { timers.delete(id); },
         isScratching() { return false; },
     };
-    const context = vm.createContext({engine, Date: {now: () => now}, components: {Deck: function() {}}, script: {deckFromGroup: g => Number(g.match(/\d+/)[0])},
+    const context = vm.createContext({engine, Date: {now: () => now}, components: {Deck: function() {}}, script: {deckFromGroup: g => Number(g.match(/\d+/)[0]),triggerControl: (g,k) => engine.setValue(g,k,1)},
         midi: {sendShortMsg() {}}, console});
+    vm.runInContext(fs.readFileSync(path.join(__dirname,"../controllers/Hercules_DJControl_Inpulse_500_RX3/Nautic-RX3-Encoder-Hercules.js"),"utf8"),context);
     vm.runInContext(source, context);
     const m = context.DJCi500;
-    m.deckA = {isShiftPressed: false}; m.deckB = {isShiftPressed: false};
+    m.deckA = {isShiftPressed: false,currentDeck:"[Channel1]"}; m.deckB = {isShiftPressed: false,currentDeck:"[Channel2]"};
     return {m, values, writes, timers, engine,
         press: () => m.rx3AssistantButton(0, 3, 127, 0x90),
         release: (value = 0, status = 0x90) => m.rx3AssistantButton(0, 3, value, status),
@@ -64,8 +65,26 @@ exact.m.rx3BrowserIgnoreUntil = 0;
 browserPress(exact); browserRelease(exact);
 assert.equal(exact.engine.getValue('[RX3Controller]', 'grid_mode'), 0);
 const browse = fixture(); browserPress(browse); browse.advance(2000);
-assert.equal(browse.engine.getValue('[RX3Controller]', 'grid_mode'), 0, 'long hold is PERFORMANCE-only');
+assert.equal(browse.engine.getValue('[RX3Controller]', 'grid_mode'), 0, 'BROWSE hold never enters GRID');
 const moved = fixture(); moved.values.set('[Tab]:current', 0);
-browserPress(moved); moved.m.rx3BrowserMovedWhilePressed = true; moved.advance(2000);
+browserPress(moved); moved.m.moveLibrary(0,0,1,0xB0); moved.advance(2000);
 assert.equal(moved.engine.getValue('[RX3Controller]', 'grid_mode'), 0);
+assert(browse.writes.some(([g,k,v]) => g==='[RX3Browser]' && k==='back' && v===1), 'BROWSE hold executes BACK');
+const shifted = fixture(); shifted.values.set('[Tab]:current',0);
+shifted.m.rx3BrowserBack(0,0,127,0x93);shifted.advance(1999);
+assert(!shifted.writes.some(([g,k]) => g==='[RX3Shortcut]' && k==='toggle'));
+shifted.advance(1);shifted.m.rx3BrowserBack(0,0,64,0x83);
+assert.equal(shifted.writes.filter(([g,k,v]) => g==='[RX3Shortcut]' && k==='toggle' && v===1).length,1);
+assert.equal(shifted.engine.getValue('[RX3Controller]','grid_mode'),0);
+const panel = fixture();panel.values.set('[RX3Shortcut]:visible',1);
+browserPress(panel);browserRelease(panel);panel.m.moveLibrary(0,0,1,0xB0);
+assert(panel.writes.some(([g,k,v]) => g==='[RX3Shortcut]' && k==='enter' && v===1));
+assert(panel.writes.some(([g,k,v]) => g==='[RX3Shortcut]' && k==='move' && v===1));
+assert(!panel.writes.some(([g,k]) => g==='[RX3Browser]' && k==='enter'));
+const load = fixture();load.values.set('[Tab]:current',0);load.writes.length=0;
+load.m.rx3LoadTrack(0,0,127,0x92,'[Channel2]');
+assert.equal(load.engine.getValue('[RX3Controller]','active_deck'),2);
+assert(!load.writes.some(([g,k]) => k==='LoadSelectedTrack'));
+load.values.set('[Tab]:current',1);load.m.rx3LoadTrack(0,0,127,0x92,'[Channel2]');
+assert(load.writes.some(([g,k,v]) => g==='[Channel2]' && k==='LoadSelectedTrack' && v===1));
 console.log('PASS: GRID exact two-second hold, release, selected-deck encoder routing, direction and cancellation');

@@ -52,6 +52,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Controller GRID input test failed' }
           node scripts/test-rx3-pad-feedback.js
           if ($LASTEXITCODE -ne 0) { throw 'Controller pad feedback test failed' }
+          node scripts/test-rx3-view-toggle.js
+          if ($LASTEXITCODE -ne 0) { throw 'Controller VIEW toggle regression failed' }
           node scripts/test-rx3-browser-exit.js
           if ($LASTEXITCODE -ne 0) { throw 'Controller or installer input test failed' }
           node scripts/test-rx3-jog-bend.js

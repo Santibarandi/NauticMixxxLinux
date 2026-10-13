@@ -6,7 +6,7 @@
     <Hotcue><Variable name="hotcue"/></Hotcue>
     <ClearBadge>false</ClearBadge>
     <Size>0me,18f</Size>
-    <Rx3Badge>true</Rx3Badge>
+    <Rx3Badge>true</Rx3Badge><Rx3GateCue><Variable name="gate"/></Rx3GateCue>
     <NumberStates>3</NumberStates>
     <State><Number>0</Number><Text><Variable name="label"/></Text></State>
     <State><Number>1</Number><Text><Variable name="label"/></Text></State>

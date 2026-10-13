@@ -21,7 +21,7 @@ NauticFLX4Browser.isOpen = function() {
 NauticFLX4Browser.open = function() {
     if (NauticFLX4Browser.isOpen()) return false;
     engine.setValue("[XDJ_RX3]", "search_active", 0);
-    NauticFLX4Browser.pulse("[Tab]", "library", 1);
+    engine.setValue("[Tab]", "library", 1);
     engine.setValue("[Skin]", "show_maximized_library", 1);
     if (NauticFLX4Browser.nativeBrowser()) {
         NauticFLX4Browser.pulse("[RX3Browser]", "open", 1);
@@ -38,7 +38,9 @@ NauticFLX4Browser.view = function(_channel, _control, value) {
         return;
     }
     engine.setValue("[Skin]", "show_maximized_library", 0);
-    NauticFLX4Browser.pulse("[Tab]", "overview", 1);
+    // Page triggers are latched; the stack clears the previous page itself.
+    // Resetting overview to zero would hide PERFORMANCE and reopen BROWSER.
+    engine.setValue("[Tab]", "overview", 1);
 };
 
 NauticFLX4Browser.source = function(_channel, _control, value) {
@@ -77,4 +79,17 @@ NauticFLX4Browser.back = function(_channel, _control, value) {
     } else {
         NauticFLX4Browser.pulse("[Library]", "MoveLeft", 1);
     }
+};
+
+// Context-aware press is completed on release, after the hold is classified.
+NauticFLX4Browser.shortPress = NauticFLX4Browser.enter;
+NauticFLX4Browser.originalTurn = NauticFLX4Browser.turn;
+NauticFLX4Browser.enter = function(channel, control, value, status, group) {
+    NauticRX3Encoder.press(NauticFLX4Browser, value, status || 0x90, false);
+};
+NauticFLX4Browser.shortcut = function(channel, control, value, status, group) {
+    NauticRX3Encoder.press(NauticFLX4Browser, value, status || 0x90, true);
+};
+NauticFLX4Browser.turn = function(channel, control, value, status, group) {
+    NauticRX3Encoder.turn(NauticFLX4Browser, channel, control, value, status, group);
 };

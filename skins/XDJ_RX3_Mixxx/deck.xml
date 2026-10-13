@@ -18,7 +18,7 @@
           </Label>
           <Label><ObjectName>DeckTitleNote</ObjectName><Text>&#9834;</Text></Label>
           <TrackProperty>
-            <ObjectName>DeckTitle</ObjectName>
+            <ObjectName>DeckTitle</ObjectName><Rx3DeckSelect><Variable name="channel"/></Rx3DeckSelect>
             <TooltipId>track_title</TooltipId>
             <SizePolicy>me,me</SizePolicy>
             <Property>title</Property>
@@ -62,7 +62,7 @@
                 <ObjectName>TrackNoQuantize</ObjectName><Text>QUANTIZE</Text>
                 <Connection><ConfigKey>[Channel<Variable name="channel"/>],quantize</ConfigKey><BindProperty>highlight</BindProperty></Connection>
               </Label>
-              <Label><ObjectName>TrackNoQuantizeValue</ObjectName><Text>1</Text><Size>0me,30f</Size><Connection><ConfigKey>[Channel<Variable name="channel"/>],quantize</ConfigKey><BindProperty>highlight</BindProperty></Connection></Label>
+              <Label><Rx3QuantizeValue>true</Rx3QuantizeValue><Channel><Variable name="channel"/></Channel><ObjectName>TrackNoQuantizeValue</ObjectName><Text>1</Text><Size>0me,30f</Size><Connection><ConfigKey>[Channel<Variable name="channel"/>],quantize</ConfigKey><BindProperty>highlight</BindProperty></Connection></Label>
               <Label><ObjectName>TrackNoFill</ObjectName><Size>0me,0me</Size></Label>
             </Children>
           </WidgetGroup>
@@ -82,8 +82,8 @@
                     <Layout>vertical</Layout>
                     <Size>88f,0me</Size>
                     <Children>
-                      <Label><ObjectName>DeckCueLabel</ObjectName><Text>A.HOT CUE</Text></Label>
-                      <Label><ObjectName>DeckAutoCueLabel</ObjectName><Text>AUTO CUE</Text></Label>
+                      <Label><ObjectName>DeckCueLabel</ObjectName><Text>A.HOT CUE</Text><Connection><ConfigKey>[RX3Display],hotcueautoload</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
+                      <Label><ObjectName>DeckAutoCueLabel</ObjectName><Text>AUTO CUE</Text><Connection><ConfigKey>[Channel<Variable name="channel"/>],rx3_auto_cue</ConfigKey><BindProperty>visible</BindProperty></Connection></Label>
                     </Children>
                   </WidgetGroup>
 
@@ -97,9 +97,9 @@
                         <Layout>horizontal</Layout>
                         <Size>0me,20f</Size>
                         <Children>
-                          <Label><ObjectName>TimeLabelRemain</ObjectName><Text>REMAIN</Text><Connection><ConfigKey>[Controls],ShowDurationRemaining</ConfigKey><Transform><IsEqual>1</IsEqual></Transform><BindProperty>highlight</BindProperty></Connection></Label>
+                          <Label><ObjectName>TimeLabelRemain</ObjectName><Text>REMAIN</Text><Connection><ConfigKey>[Channel<Variable name="channel"/>],rx3_time_remaining</ConfigKey><Transform><IsEqual>1</IsEqual></Transform><BindProperty>highlight</BindProperty></Connection></Label>
                           <Label><ObjectName>TimeLabelSlash</ObjectName><Text>/</Text></Label>
-                          <Label><ObjectName>TimeLabelTime</ObjectName><Text>TIME</Text><Connection><ConfigKey>[Controls],ShowDurationRemaining</ConfigKey><Transform><IsEqual>0</IsEqual></Transform><BindProperty>highlight</BindProperty></Connection></Label>
+                          <Label><ObjectName>TimeLabelTime</ObjectName><Text>TIME</Text><Connection><ConfigKey>[Channel<Variable name="channel"/>],rx3_time_remaining</ConfigKey><Transform><IsEqual>0</IsEqual></Transform><BindProperty>highlight</BindProperty></Connection></Label>
                         </Children>
                       </WidgetGroup>
                       <WidgetGroup>
@@ -125,9 +125,9 @@
                     <Layout>vertical</Layout>
                     <Size>100f,0me</Size>
                     <Children>
-                      <WidgetGroup><ObjectName>DeckTempoRow</ObjectName><Layout>horizontal</Layout><Size>0me,22f</Size><Children>
+                      <WidgetGroup><ObjectName>DeckTempoRow</ObjectName><Layout>horizontal</Layout><Size>0me,20f</Size><Children>
                         <Label><ObjectName>DeckTempoCaption</ObjectName><Text>TEMPO</Text></Label>
-                        <WidgetGroup><ObjectName>RateRangeBadge</ObjectName><Rx3RangeBadge>true</Rx3RangeBadge><Channel><Variable name="channel"/></Channel><Layout>horizontal</Layout><Size>50f,20f</Size><Children><RateRange><ObjectName>RateDisplay</ObjectName><TooltipId>rate_range_display</TooltipId><Channel><Variable name="channel"/></Channel><Display>range</Display></RateRange><Label><ObjectName>RateRangeSuffix</ObjectName><Text>%</Text><Size>12f,0me</Size></Label></Children></WidgetGroup>
+                        <WidgetGroup><ObjectName>RateRangeBadge</ObjectName><Rx3RangeBadge>true</Rx3RangeBadge><Channel><Variable name="channel"/></Channel><Size>50f,20f</Size></WidgetGroup>
                       </Children></WidgetGroup>
                       <WidgetGroup><ObjectName>DeckTempoPercentRow</ObjectName><Layout>horizontal</Layout><Size>0me,0me</Size><Children>
                         <NumberRate><ObjectName>DeckTempoPercent</ObjectName><TooltipId>rate_display</TooltipId><Channel><Variable name="channel"/></Channel><NumberOfDigits>2</NumberOfDigits></NumberRate>

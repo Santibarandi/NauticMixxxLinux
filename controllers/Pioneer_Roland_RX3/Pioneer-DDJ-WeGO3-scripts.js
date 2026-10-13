@@ -531,8 +531,9 @@ wego3.samplerButtonShifted = function (channel, control, value, status, group) {
 
 wego3.syncButton = function (channel, control, value, status, group) {
   group = wego3.actualGroup(group);
-  if (value) {
+  if (value && !engine.getValue(group, 'rx3_source_lost')) {
     script.toggleControl(group, 'sync_enabled');
+    if (engine.getValue(group, 'sync_enabled')) { engine.setValue(group, 'beatsync_phase', 1); }
   }
 };
 

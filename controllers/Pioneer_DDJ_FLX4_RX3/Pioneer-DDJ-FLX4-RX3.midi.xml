@@ -10,6 +10,7 @@
         <scriptfiles>
             <file filename="Pioneer-DDJ-FLX4-script.js" functionprefix="PioneerDDJFLX4" />
             <file functionprefix="NauticFLX4Browser" filename="Pioneer-DDJ-FLX4-RX3-Browser.js" />
+            <file functionprefix="NauticRX3Encoder" filename="Nautic-RX3-Encoder-FLX4.js"/>
         </scriptfiles>
         <controls>
             <control>
@@ -446,23 +447,19 @@
             </control>
             <control>
                 <group>[Channel1]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play1</key>
                 <description>PLAY/PAUSE (DECK1) - press - Play/Pause</description>
                 <status>0x90</status>
                 <midino>0x0B</midino>
-                <options>
-                    <normal />
-                </options>
+                <options><Script-Binding/></options>
             </control>
             <control>
                 <group>[Channel2]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play2</key>
                 <description>PLAY/PAUSE (DECK2) - press - Play/Pause</description>
                 <status>0x91</status>
                 <midino>0x0B</midino>
-                <options>
-                    <normal />
-                </options>
+                <options><Script-Binding/></options>
             </control>
             <control>
                 <group>[EqualizerRack1_[Channel1]_Effect1]</group>
@@ -1610,7 +1607,7 @@
             </control>
             <control>
                 <group>[Library]</group>
-                <key>NauticFLX4Browser.back</key>
+                <key>NauticFLX4Browser.shortcut</key>
                 <description>SHIFT + BROWSE: back</description>
                 <status>0x96</status>
                 <midino>0x42</midino>

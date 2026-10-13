@@ -65,5 +65,5 @@ Para GitHub, crea el tag y el Release de la versión validada, adjunta los
 artefactos aprobados y describe las pruebas físicas pendientes. Nunca incluyas
 certificados, claves, perfiles personales, bases SQLite, música ni logs.
 
-La release local vigente está en `../../../release/1.9.1/`. La versión
-`../../../release/1.9.0/` se conserva como respaldo estable.
+La release local vigente está en `../../../release/2.0.0/`. La versión
+`../../../release/1.9.1/` se conserva como respaldo estable.

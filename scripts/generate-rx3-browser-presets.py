@@ -48,7 +48,7 @@ def sx3_source() -> ET.Element:
 MODELS = (
     ("DDJ-400", VENDOR / "Pioneer-DDJ-400.midi.xml", None,
      (("turn", 0xB6, 0x40), ("enter", 0x96, 0x41),
-      ("back", 0x96, 0x42), ("source", 0x96, 0x68),
+      ("shortcut", 0x96, 0x42), ("source", 0x96, 0x68),
       ("view", 0x96, 0x7A))),
     ("DDJ-SX", VENDOR / "Pioneer DDJ-SX.midi.xml", None,
      (("turn", 0xB6, 0x40), ("enter", 0x96, 0x41),
@@ -64,7 +64,7 @@ MODELS = (
       ("view", 0x96, 0x66))),
     ("DDJ-WeGO3", VENDOR / "Pioneer-DDJ-WeGO3.midi.xml", "DDJ-WeGO3",
      (("turn", 0xB6, 0x40), ("enter", 0x96, 0x41),
-      ("back", 0x96, 0x42), ("source", 0x96, 0x58),
+      ("shortcut", 0x96, 0x42), ("source", 0x96, 0x58),
       ("view", 0x96, 0x59))),
     ("DJ-505", VENDOR / "Roland_DJ-505.midi.xml", None,
      (("turn", 0xBF, 0x00), ("turn", 0xBF, 0x01),
@@ -75,6 +75,8 @@ MODELS = (
 
 def generate() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
+    helper=(NAUTIC/"controllers/Pioneer_DDJ_FLX4_RX3/Nautic-RX3-Encoder-FLX4.js").read_text().split("\nNauticRX3Encoder.play1 =")[0]
+    wrappers=[]
     for model, source, controller_id, bindings in MODELS:
         root = sx3_source() if source is None else ET.parse(source).getroot()
         info = root.find("info")
@@ -111,10 +113,30 @@ def generate() -> None:
             ET.SubElement(control, "midino").text = f"0x{midino:02X}"
             ET.SubElement(ET.SubElement(control, "options"), "script-binding")
             controls.append(control)
+        for control in controls:
+            key=control.findtext("key") or ""
+            if key=="PioneerDDJSX.rotarySelectorShiftedClick":
+                control.find("key").text="NauticRX3Browser.shortcut"
+            if key!="play" and not key.endswith(".play.input") and key not in ("PioneerDDJSX.playButton","PioneerDDJWeGO3.playButton"):
+                continue
+            name=f"NauticRX3Encoder.play{len(wrappers)+1}"
+            original=("if(v>0 && (st & 0xF0)!==0x80) engine.setValue(g,\"play\",engine.getValue(g,\"play\")>0?0:1);"
+                      if key=="play" else key+"(c,k,v,st,g);")
+            brake_group="PioneerDDJWeGO3.actualGroup(g)" if key=="PioneerDDJWeGO3.playButton" else "g"
+            wrappers.append(f"\n{name} = function(c,k,v,st,g) {{\n    if (NauticRX3Encoder.brakePress(v,st,{brake_group})) return;\n    {original}\n}};\n")
+            control.find("key").text=name
+            options=control.find("options")
+            if options is not None: control.remove(options)
+            ET.SubElement(ET.SubElement(control,"options"),"script-binding")
+        # Register the shared v2 encoder, including lifecycle timer cleanup.
+        scriptfiles = controller.find("scriptfiles")
+        assert scriptfiles is not None
+        ET.SubElement(scriptfiles,"file",functionprefix="NauticRX3Encoder",filename="Nautic-RX3-Encoder-Pioneer-Roland.js")
         ET.indent(root, space="    ")
         path = OUTPUT / f"{model}-Nautic-RX3.midi.xml"
         ET.ElementTree(root).write(path, encoding="utf-8", xml_declaration=True)
         print(path.relative_to(NAUTIC))
+    (OUTPUT/"Nautic-RX3-Encoder-Pioneer-Roland.js").write_text(helper+"\n"+"".join(wrappers))
 
 
 if __name__ == "__main__":

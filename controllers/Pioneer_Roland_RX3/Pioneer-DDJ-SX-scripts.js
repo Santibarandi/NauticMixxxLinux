@@ -621,7 +621,7 @@ PioneerDDJSX.bindDeckControlConnections = function(channelGroup, bind) {
             'bpm_tap': 'PioneerDDJSX.shiftHeadphoneCueLed',
             'VuMeter': 'PioneerDDJSX.VuMeterLeds',
             'keylock': 'PioneerDDJSX.keyLockLed',
-            'slip_enabled': 'PioneerDDJSX.slipLed',
+            'slip_indicator': 'PioneerDDJSX.slipLed',
             'quantize': 'PioneerDDJSX.quantizeLed',
             'loop_in': 'PioneerDDJSX.loopInLed',
             'loop_out': 'PioneerDDJSX.loopOutLed',
@@ -1525,8 +1525,9 @@ PioneerDDJSX.gridSlideButton = function(channel, control, value, status, group) 
 };
 
 PioneerDDJSX.syncButton = function(channel, control, value, status, group) {
-    if (value) {
+    if (value && !engine.getValue(group, "rx3_source_lost")) {
         script.toggleControl(group, "sync_enabled");
+        if (engine.getValue(group, "sync_enabled")) { engine.setValue(group, "beatsync_phase", 1); }
     }
 };
 

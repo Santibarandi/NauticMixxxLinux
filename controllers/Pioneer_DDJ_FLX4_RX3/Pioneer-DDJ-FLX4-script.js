@@ -519,10 +519,12 @@ PioneerDDJFLX4.cueLoopCallRight = function(_channel, _control, value, _status, g
 //
 
 PioneerDDJFLX4.syncPressed = function(channel, control, value, status, group) {
-    if (engine.getValue(group, "sync_enabled") && value > 0) {
+    if (value <= 0 || engine.getValue(group, "rx3_source_lost")) { return; }
+    if (engine.getValue(group, "sync_enabled")) {
         engine.setValue(group, "sync_enabled", 0);
     } else {
-        engine.setValue(group, "beatsync", value);
+        engine.setValue(group, "sync_enabled", 1);
+        engine.setValue(group, "beatsync_phase", 1);
     }
 };
 

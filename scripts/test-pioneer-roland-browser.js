@@ -16,6 +16,7 @@ function setup(native) {
     ]);
     const writes = [];
     const engine = {
+        beginTimer() {return 1;}, stopTimer() {},
         getValue(group, key) { return values.get(`${group}:${key}`) || 0; },
         setValue(group, key, value) {
             writes.push([group, key, value]);
@@ -29,6 +30,7 @@ function setup(native) {
         },
     };
     const context = vm.createContext({engine});
+    vm.runInContext(fs.readFileSync(path.join(__dirname,"../controllers/Pioneer_Roland_RX3/Nautic-RX3-Encoder-Pioneer-Roland.js"),"utf8"),context);
     vm.runInContext(source, context);
     return {browser: context.NauticRX3Browser, values, writes};
 }
@@ -37,7 +39,7 @@ for (const native of [false, true]) {
     const {browser, values, writes} = setup(native);
     browser.turn(0, 0, 1);
     assert.equal(writes.length, 0, 'turn while closed must not alter the deck');
-    browser.enter(0, 0, 127);
+    browser.enter(0, 0, 127);browser.enter(0, 0, 0);
     assert.equal(values.get('[Skin]:show_maximized_library'), 1);
     assert.equal(writes.some(([, key]) => key === 'enter' || key === 'GoToItem'), false,
         'opening press must not also select');
@@ -48,7 +50,7 @@ for (const native of [false, true]) {
         (native ? k === 'move' && v === 1 : k === 'MoveDown' && v === 1)));
     assert(writes.some(([g, k, v]) => g === group &&
         (native ? k === 'move' && v === -1 : k === 'MoveUp' && v === 1)));
-    browser.enter(0, 0, 127);
+    browser.enter(0, 0, 127);browser.enter(0, 0, 0);
     browser.back(0, 0, 127);
     assert(writes.some(([g, k, v]) => g === group &&
         k === (native ? 'enter' : 'GoToItem') && v === 1));

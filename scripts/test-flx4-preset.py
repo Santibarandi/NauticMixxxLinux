@@ -13,7 +13,7 @@ assert root.tag == "MixxxControllerPreset"
 assert root.find("./controller").get("id") == "DDJ-FLX4"
 
 scripts = {entry.get("filename") for entry in root.findall("./controller/scriptfiles/file")}
-assert scripts == {"Pioneer-DDJ-FLX4-script.js", "Pioneer-DDJ-FLX4-RX3-Browser.js"}
+assert scripts == {"Pioneer-DDJ-FLX4-script.js", "Pioneer-DDJ-FLX4-RX3-Browser.js", "Nautic-RX3-Encoder-FLX4.js"}
 assert all((directory / name).is_file() for name in scripts)
 
 controls = root.findall("./controller/controls/control")
@@ -32,7 +32,7 @@ assert original_signature == "1a78d846b07b7263cab4f455251ed4b98692065a99ece68717
 expected = {
     ("0xB6", "0x40"): ("[Library]", "NauticFLX4Browser.turn"),
     ("0x96", "0x41"): ("[Library]", "NauticFLX4Browser.enter"),
-    ("0x96", "0x42"): ("[Library]", "NauticFLX4Browser.back"),
+    ("0x96", "0x42"): ("[Library]", "NauticFLX4Browser.shortcut"),
     ("0x96", "0x68"): ("[Library]", "NauticFLX4Browser.source"),
     ("0x96", "0x7A"): ("[Library]", "NauticFLX4Browser.view"),
     ("0x96", "0x46"): ("[Channel1]", "LoadSelectedTrack"),

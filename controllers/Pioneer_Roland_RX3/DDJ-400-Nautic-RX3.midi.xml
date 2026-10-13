@@ -11,6 +11,7 @@
         <scriptfiles>
             <file functionprefix="PioneerDDJ400" filename="Pioneer-DDJ-400-script.js" />
             <file functionprefix="NauticRX3Browser" filename="Nautic-RX3-Browser.js" />
+            <file functionprefix="NauticRX3Encoder" filename="Nautic-RX3-Encoder-Pioneer-Roland.js" />
         </scriptfiles>
         <controls>
             <control>
@@ -56,11 +57,11 @@
             <control>
                 <description>PLAY/PAUSE (DECK1) - press - Play/Pause</description>
                 <group>[Channel1]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play1</key>
                 <status>0x90</status>
                 <midino>0x0B</midino>
                 <options>
-                    <Normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
@@ -76,11 +77,11 @@
             <control>
                 <description>PLAY/PAUSE (DECK2) - press - Play/Pause</description>
                 <group>[Channel2]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play2</key>
                 <status>0x91</status>
                 <midino>0x0B</midino>
                 <options>
-                    <Normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
@@ -2025,8 +2026,8 @@
             </control>
             <control>
                 <group>[Library]</group>
-                <key>NauticRX3Browser.back</key>
-                <description>NauticMixxx RX3 browser: back</description>
+                <key>NauticRX3Browser.shortcut</key>
+                <description>NauticMixxx RX3 browser: shortcut</description>
                 <status>0x96</status>
                 <midino>0x42</midino>
                 <options>

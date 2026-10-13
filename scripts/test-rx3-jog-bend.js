@@ -116,7 +116,7 @@ for (const deck of [1, 2, 3, 4]) {
     jog.inputWheel(0, 0x09, 4, 0xB1, group);
     shiftedJog.inputWheel(0, 0x09, 4, 0xB4, group);
     assert.equal(writes.length, 0);
-    if (deck <= 2) assert.equal(values.get(key("[RX3Controller]", "active_deck")), deck);
+    if (deck <= 2) assert.equal(values.get(key("[RX3Controller]", "active_deck")), undefined, "jog must never select a deck");
     values.set(key("[RX3Controller]", "grid_mode"), 0);
     mapper.rx3AdjustLoopPoint = (data, delta, resolution) => {
         assert.equal(data, deckData);

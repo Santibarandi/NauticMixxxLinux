@@ -8,7 +8,7 @@ case "$candidate_name" in
   *[!A-Za-z0-9._-]*|'') printf 'Nombre de candidato inválido.\n' >&2; exit 1 ;;
 esac
 version=$(cat "$project/VERSION")
-build_dir=${2:-"$project/build/test-candidate/$version-native-build"}
+build_dir=${2:-"$project/build/test-candidate/macos/native-build"}
 candidate="$project/build/test-candidate/$candidate_name"
 if [ -e "$candidate" ]; then
   printf 'El test candidate ya existe: %s\n' "$candidate" >&2
@@ -44,6 +44,9 @@ version=$(cat "$project/VERSION")
 plutil -replace CFBundleShortVersionString -string "$version" "$app/Contents/Info.plist"
 plutil -replace CFBundleVersion -string "$version" "$app/Contents/Info.plist"
 python3 "$project/scripts/configure-nauticmixxx-profile.py" --app "$app" --profile-dir "$candidate/profile"
+# Seed every bundled preset before first launch. Qt's APFS clonefile import
+# can wait on a privacy prompt before the application's window exists.
+ditto "$resources/effects/chains" "$candidate/profile/effects/chains"
 ditto "$candidate/profile" "$resources/nautic-test-profile"
 python3 - "$resources/nautic-test-profile/mixxx.cfg" "$candidate/profile" <<'PY'
 import pathlib
@@ -53,10 +56,16 @@ config.write_text(config.read_text().replace(sys.argv[2], '@NAUTIC_TEST_PROFILE@
 PY
 safe_id=$(printf '%s' "$candidate_name" | tr '._' '-')
 plutil -replace CFBundleIdentifier -string "org.nauticsoftware.nauticmixxx.test.v$safe_id" "$app/Contents/Info.plist"
-sdk="$project/build/test-candidate/updater-dependencies/sparkle"
+sdk="$project/build/test-candidate/macos/dependencies/sparkle"
 python3 "$project/scripts/sparkle-sdk.py" --destination "$sdk"
 python3 "$project/scripts/configure-updater-macos.py" --app "$app" --sdk "$sdk"
 codesign --verify --deep --strict "$app"
+cp "$project/RELEASE_NOTES.md" "$candidate/RELEASE_NOTES.md"
+cp "$project/docs/SHORTCUT-2.0-EN.md" "$candidate/SHORTCUT-2.0-EN.md"
+cp "$project/docs/SOURCE-MY-SETTINGS-2.0-EN.md" "$candidate/SOURCE-MY-SETTINGS-2.0-EN.md"
+cp "$project/docs/UTILITY-2.0-EN.md" "$candidate/UTILITY-2.0-EN.md"
+cp "$project/docs/BEAT-FX-CONTROLS-EN.md" "$candidate/BEAT-FX-CONTROLS-EN.md"
+cp "$project/docs/INFO-USB-2.0-EN.md" "$candidate/INFO-USB-2.0-EN.md"
 cp "$project/docs/DDJ-FLX4-EN.md" "$candidate/DDJ-FLX4-EN.md"
 cp "$project/docs/CONTROLLERS-RX3-1.5.md" "$candidate/CONTROLLERS-RX3-1.5.md"
 cp "$project/docs/JOG-CALIBRATION-1.5.md" "$candidate/JOG-CALIBRATION-1.5.md"

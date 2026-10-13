@@ -84,6 +84,13 @@ assert.equal(values.get(key("[Channel1]", "sync_enabled")), 1);
 mapping.rx3SyncButton(deckA, 0x7F, 0x91);
 assert.equal(values.get(key("[Channel1]", "sync_enabled")), 0);
 
+mapping.rx3SyncButton(deckA, 0x7F, 0x90);
+assert.equal(values.get(key("[Channel1]", "sync_enabled")), 1);
+assert.equal(values.get(key("[Channel1]", "beatsync_phase")), 1);
+mapping.rx3SyncButton(deckA, 0, 0x90);
+assert.equal(values.get(key("[Channel1]", "sync_enabled")), 1);
+mapping.rx3SyncButton(deckA, 0x7F, 0x90);
+assert.equal(values.get(key("[Channel1]", "sync_enabled")), 0);
 mapping.rx3SyncButton(deckA, 0x7F, 0x94);
 mapping.rx3SyncButton(deckB, 0x7F, 0x95);
 assert.equal(values.get(key("[Channel1]", "keylock")), 1);
@@ -121,10 +128,24 @@ assert.match(source,
     /this\.syncButton = new components\.Button\([\s\S]*?outKey: "sync_enabled"/,
     "the SYNC LED must be connected to each deck's persistent sync state");
 assert.match(source,
-    /this\.slipButton = new components\.Button\([\s\S]*?outKey: "slip_enabled"/,
-    "the SLIP LED must follow Mixxx's real slip state");
+    /this\.slipButton = new components\.Button\([\s\S]*?outKey: "slip_indicator"/,
+    "the SLIP LED must follow the engine blinking indicator");
 assert.match(source,
     /engine\.beginTimer\(500,[\s\S]*?deckA\.syncButton\.trigger\(\)[\s\S]*?deckB\.syncButton\.trigger\(\)[\s\S]*?deckA\.slipButton\.trigger\(\)[\s\S]*?deckB\.slipButton\.trigger\(\)/,
     "SYNC and SLIP LEDs must be repainted after PortMidi finishes opening");
 
 console.log("RX3 SLIP, SYNC, tempo range and long LOOP IN tests passed");
+
+// SLIP LOOP is a held action, including pad overlap and note-off releases.
+mapping.rx3SlipLoopPad("[Channel1]", 3, 127, 0x96);
+assert.equal(values.get(key("[Channel1]", "rx3_slip_loop")), 0.25);
+mapping.rx3SlipLoopPad("[Channel1]", 7, 127, 0x96);
+assert.equal(values.get(key("[Channel1]", "rx3_slip_loop")), 1/3);
+mapping.rx3SlipLoopPad("[Channel1]", 7, 0, 0x86);
+assert.equal(values.get(key("[Channel1]", "rx3_slip_loop")), 0.25);
+mapping.rx3SlipLoopPad("[Channel1]", 3, 0, 0x86);
+assert.equal(values.get(key("[Channel1]", "rx3_slip_loop")), 0);
+mapping.rx3SlipLoopPad("[Channel2]", 8, 127, 0x97);
+assert.equal(values.get(key("[Channel2]", "rx3_slip_loop")), 0.75);
+assert.equal(values.get(key("[Channel1]", "rx3_slip_loop")), 0);
+console.log("PASS: SLIP LOOP held pads, fractional beats, overlap release and deck isolation");

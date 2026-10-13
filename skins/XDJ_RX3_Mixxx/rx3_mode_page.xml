@@ -9,6 +9,7 @@
         <Text><Variable name="title"/></Text>
         <Size>0me,16f</Size>
       </Label>
+      <WidgetGroup><ObjectName>RX3ModeTitleGap</ObjectName><Size>0me,8f</Size></WidgetGroup>
       <WidgetGroup>
         <ObjectName>RX3ModePadRow</ObjectName>
         <Layout>horizontal</Layout>
@@ -20,7 +21,7 @@
           <Template src="skin:rx3_mode_pad.xml"><SetVariable name="label"><Variable name="p4"/></SetVariable></Template>
         </Children>
       </WidgetGroup>
-      <WidgetGroup><ObjectName>RX3ModeRowGap</ObjectName><Size>0me,4f</Size></WidgetGroup>
+      <WidgetGroup><ObjectName>RX3ModeRowGap</ObjectName><Size>0me,10f</Size></WidgetGroup>
       <WidgetGroup>
         <ObjectName>RX3ModePadRow</ObjectName>
         <Layout>horizontal</Layout>

@@ -65,6 +65,7 @@ DJ505.trsGroup = "Auxiliary1";  // TR-S input
 
 DJ505.init = function() {
     DJ505.shiftButton = function(channel, control, value, _status, _group) {
+        DJ505.rx3ShiftPressed = value > 0;
         DJ505.deck.concat(DJ505.effectUnit, [DJ505.sampler, DJ505.browseEncoder]).forEach(
             value ? function(module) { module.shift(); } : function(module) { module.unshift(); }
         );
@@ -634,7 +635,10 @@ DJ505.Deck = function(deckNumbers, offset) {
         },
         unshift: function() {
             this.onShortPress = function() {
-                script.triggerControl(this.group, "beatsync", 1);
+                if (engine.getValue(this.group, "rx3_source_lost")) { return; }
+                const enabled = engine.getValue(this.group, "sync_enabled");
+                engine.setValue(this.group, "sync_enabled", enabled ? 0 : 1);
+                if (!enabled) { engine.setValue(this.group, "beatsync_phase", 1); }
             };
             this.onLongPress = function() {
                 if (engine.getValue(this.group, "sync_enabled")) {
@@ -969,7 +973,7 @@ DJ505.SlipModeButton.prototype.unshift = function() {
         );
     };
     this.inKey = "slip_enabled";
-    this.outKey = "slip_enabled";
+    this.outKey = "slip_indicator";
     this.type = components.Button.prototype.types.push;
     this.disconnect();
     this.connect();

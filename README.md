@@ -1,21 +1,10 @@
-# NauticMixxx 1.9.1
+# NauticMixxx 2.0.0
 
-
-Version 1.9.1 adds free, signed integrated updates with immediate installation or
-installation on quit, and corrects fullscreen scaling, readout typography,
-STATUS spacing and accent colors. It also aligns the performance panels,
-restores exclusive ZOOM/GRID highlighting and refreshes Hercules hot-cue LEDs.
-Version [1.9.0](https://github.com/nauticsoftware/NauticMixxx/releases/tag/v1.9.0) remains available as the stable fallback.
-See the [integrated update guide](docs/UPDATES-1.9.1.md).
-
-Version 1.9.0 adds immediate USB category previews, paired browse columns,
-touch search and temporary USB folder playback. Performance adds an active deck
-selection outline, two-second BROWSER hold for GRID editing and selected-deck
-encoder/tools. It refines pad labels, BEAT JUMP buttons, numeric typography and
-the deck playback badge. The macOS RX3 window is frameless at 1280×800.
-See the [browser guide](docs/BROWSER-NAVIGATION-1.9.md) and
-[performance GRID guide](docs/PERFORMANCE-GRID-1.9.md).
-Available for macOS Apple Silicon and Windows x64.
+Version 2.0.0 adds unified UTILITY and SHORTCUT controls, SOURCE MY SETTINGS,
+Beat FX favorites and X-PAD, USB performance saves, emergency playback and
+precise rekordbox synchronization. Available for macOS Apple Silicon and Windows x64.
+See the [release notes](RELEASE_NOTES.md) and [RX3 workflow guide](docs/RX3-WORKFLOW-2.0-EN.md).
+Version [1.9.1](https://github.com/nauticsoftware/NauticMixxx/releases/tag/v1.9.1) remains available as a fallback.
 
 ![NauticMixxx2](branding/NauticMixxx2.png)
 ![NauticMixxx](branding/NauticMixxx_Home.png)
@@ -32,13 +21,14 @@ NauticMixxx is an open-source community edition of Mixxx 2.5.6. It brings an XDJ
 - v1.5 presets add mouse-free RX3 browsing for DDJ-400, DDJ-SX, DDJ-SX2, DDJ-SX3, DDJ-WeGO3 and Roland DJ-505; see the [controller guide](docs/CONTROLLERS-RX3-1.5-EN.md). Hardware validation is pending.
 - Optional DDJ-FLX6 **browser-only** preset for VIEW, SOURCE, BROWSE, BACK and LOAD 1/2. It does not replace a full controller mapping; see the [DDJ-FLX6 guide](docs/DDJ-FLX6-EN.md).
 - Four Sound Color FX, NauticMixxx branding, reproducible patches, tests and release checksums.
+- Unified UTILITY adds shared encoder-operated controls, Gate Cue, both Beat Loop tables, independent Release FX, memory cues/Active Loops, USB performance saves, playlist/history creation, preview and REC. See [implemented scope and remaining work](docs/RX3-WORKFLOW-2.0-EN.md).
 
 ## Download and install
 
-Download NauticMixxx 1.9.1 from the [release page](https://github.com/nauticsoftware/NauticMixxx/releases/tag/v1.9.1):
+Download NauticMixxx 2.0.0 from the [release page](https://github.com/nauticsoftware/NauticMixxx/releases/tag/v2.0.0):
 
-- [macOS Apple Silicon DMG](https://github.com/nauticsoftware/NauticMixxx/releases/download/v1.9.1/NauticMixxx-1.9.1-macOS-arm64.dmg)
-- [Windows x64 installer](https://github.com/nauticsoftware/NauticMixxx/releases/download/v1.9.1/NauticMixxx-1.9.1-Windows-x64-Setup.exe)
+- [macOS Apple Silicon DMG](https://github.com/nauticsoftware/NauticMixxx/releases/download/v2.0.0/NauticMixxx-2.0.0-macOS-arm64.dmg)
+- [Windows x64 installer](https://github.com/nauticsoftware/NauticMixxx/releases/download/v2.0.0/NauticMixxx-2.0.0-Windows-x64-Setup.exe)
 
 The Windows installer includes the native NauticMixxx program, RX3 skin, controller mappings and effects. The app and profile are separate from official Mixxx. Uninstall from Windows Settings; personal settings remain in `%LOCALAPPDATA%\NauticMixxx`.
 
@@ -67,7 +57,7 @@ The Linux recipe was validated with version 1.5.0: native builds, RX3 tests and 
 [Ubuntu 24.04 x86_64 and ARM64](https://github.com/nauticsoftware/NauticMixxx/actions/runs/37158960601)
 and [Debian 12 ARM64](https://github.com/nauticsoftware/NauticMixxx/actions/runs/37159816188).
 The Bookworm build uses Debian's userland; it still needs physical Pi testing.
-No native Linux 1.9.1 package is provided.
+No native Linux 2.0.0 package is provided.
 
 ```sh
 ./scripts/install-linux-build-deps.sh

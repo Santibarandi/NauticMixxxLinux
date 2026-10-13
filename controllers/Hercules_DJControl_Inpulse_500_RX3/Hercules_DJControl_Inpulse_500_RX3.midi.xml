@@ -11,6 +11,7 @@
         <scriptfiles>
             <file filename="midi-components-0.0.js" />
             <file functionprefix="DJCi500" filename="Hercules-DJControl-Inpulse-500-RX3-script.js" />
+            <file functionprefix="NauticRX3Encoder" filename="Nautic-RX3-Encoder-Hercules.js"/>
         </scriptfiles>
         <controls>
             <!--Note Number (NN) - Buttons/switches/Encoders -->
@@ -80,7 +81,7 @@
             <!--Play-->
             <control>
                 <group>[Channel1]</group>
-                <key>DJCi500.deckA.playButton.input</key>
+                <key>NauticRX3Encoder.play1</key>
                 <description>Play button</description>
                 <status>0x91</status>
                 <midino>0x07</midino>
@@ -305,7 +306,7 @@
             <!--Play-->
             <control>
                 <group>[Channel2]</group>
-                <key>DJCi500.deckB.playButton.input</key>
+                <key>NauticRX3Encoder.play2</key>
                 <description>Play button</description>
                 <status>0x92</status>
                 <midino>0x07</midino>
@@ -532,7 +533,7 @@
             <control>
                 <group>[Library]</group>
                 <key>DJCi500.rx3BrowserBack</key>
-                <description>SHIFT + BROWSER push - go back one hierarchy level</description>
+                <description>SHIFT + BROWSER hold - SHORTCUT</description>
                 <status>0x93</status>
                 <midino>0x00</midino>
                 <options>

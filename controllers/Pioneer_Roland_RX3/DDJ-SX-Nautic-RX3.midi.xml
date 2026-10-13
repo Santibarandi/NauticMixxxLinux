@@ -13,6 +13,7 @@
             <file filename="midi-components-0.0.js" />
             <file functionprefix="PioneerDDJSX" filename="Pioneer-DDJ-SX-scripts.js" />
             <file functionprefix="NauticRX3Browser" filename="Nautic-RX3-Browser.js" />
+            <file functionprefix="NauticRX3Encoder" filename="Nautic-RX3-Encoder-Pioneer-Roland.js" />
         </scriptfiles>
         <controls>
             <control>
@@ -117,7 +118,7 @@
             </control>
             <control>
                 <group>[Library]</group>
-                <key>PioneerDDJSX.rotarySelectorShiftedClick</key>
+                <key>NauticRX3Browser.shortcut</key>
                 <description>Choose item (double click on selected item) (old: Expand/collapse selected sidebar item), Button: SHIFT &amp; BROWSER PRESS</description>
                 <status>0x96</status>
                 <midino>0x42</midino>
@@ -377,7 +378,7 @@
             </control>
             <control>
                 <group>[Channel1]</group>
-                <key>PioneerDDJSX.playButton</key>
+                <key>NauticRX3Encoder.play3</key>
                 <description>Toggles Play/Pause Deck 1, Button: left PLAY (Deck 1 active)</description>
                 <status>0x90</status>
                 <midino>0x0B</midino>
@@ -1847,7 +1848,7 @@
             </control>
             <control>
                 <group>[Channel2]</group>
-                <key>PioneerDDJSX.playButton</key>
+                <key>NauticRX3Encoder.play4</key>
                 <description>Toggles Play/Pause Deck 2, Button: right PLAY (Deck 2 active)</description>
                 <status>0x91</status>
                 <midino>0x0B</midino>
@@ -3317,7 +3318,7 @@
             </control>
             <control>
                 <group>[Channel3]</group>
-                <key>PioneerDDJSX.playButton</key>
+                <key>NauticRX3Encoder.play5</key>
                 <description>Toggles Play/Pause Deck 3, Button: left PLAY (Deck 3 active)</description>
                 <status>0x92</status>
                 <midino>0x0B</midino>
@@ -4787,7 +4788,7 @@
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>PioneerDDJSX.playButton</key>
+                <key>NauticRX3Encoder.play6</key>
                 <description>Toggles Play/Pause Deck 4, Button: right PLAY (Deck 4 active)</description>
                 <status>0x93</status>
                 <midino>0x0B</midino>

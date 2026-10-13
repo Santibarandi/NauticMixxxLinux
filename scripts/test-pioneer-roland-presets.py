@@ -30,6 +30,16 @@ for model, source, controller_id, bindings in module["MODELS"]:
     assert len(after_controls) - len(after) == len(before_controls) - len(before), model
     assert set(after) == set(before) | browser_addresses, model
     for midi, original in before.items():
+        # v2 vinyl-stop wrappers retain the complete transport callback.
+        if (after[midi].findtext("key") or "").startswith("NauticRX3Encoder.play"):
+            key=original.findtext("key")
+            helper=(output/"Nautic-RX3-Encoder-Pioneer-Roland.js").read_text()
+            assert key=="play" or key+"(c,k,v,st,g)" in helper, (model,midi,key)
+            assert after[midi].findtext("group")==original.findtext("group"), (model,midi)
+            continue
+        if original.findtext("key")=="PioneerDDJSX.rotarySelectorShiftedClick":
+            assert after[midi].findtext("key")=="NauticRX3Browser.shortcut"
+            continue
         if midi not in browser_addresses:
             def fields(element):
                 return [(child.tag, (child.text or "").strip(), tuple(child.attrib.items()))

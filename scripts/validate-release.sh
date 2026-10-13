@@ -32,6 +32,10 @@ node scripts/test-rx3-jog-bend.js
 node scripts/test-rx3-browser-exit.js
 node scripts/test-rx3-performance-grid.js
 node scripts/test-rx3-pad-feedback.js
+node scripts/test-rx3-view-toggle.js
+node scripts/test-rx3-shortcut-transport.js
+node scripts/test-rx3-sync.js
+python3 scripts/test-rx3-controller-package.py
 node scripts/test-flx6-browser.js
 node scripts/test-flx4-browser.js
 python3 scripts/test-flx4-preset.py

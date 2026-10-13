@@ -16,6 +16,7 @@
         <Layout>horizontal</Layout>
         <Size>0me,40f</Size>
         <Children>
+          <PushButton><Rx3MemoryButton>true</Rx3MemoryButton><Channel><Variable name="channel"/></Channel><ObjectName>RX3GridTool</ObjectName><Size>0me,40f</Size><NumberStates>1</NumberStates><State><Number>0</Number><Text>MEMORY</Text></State></PushButton>
           <PushButton>
             <ObjectName>RX3GridTool</ObjectName>
             <Size>0me,40f</Size>

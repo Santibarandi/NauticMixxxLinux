@@ -287,3 +287,210 @@ category order, keyboard input, and USB folder confinement/policy.
   directional beat-jump rendering and a frameless 1280×800 macOS RX3 window.
 
 - `0027-browser-continuous-column-divider.patch`: removes reserved left-list scrollbar gaps and paints one full-height gray divider between USB browse columns, including header and blank rows. Overflow remains navigable.
+
+
+- `0028-integrated-updates-and-display-corrections.patch`: integrated signed updates, pad feedback, selected-deck stability, typography and fullscreen display corrections from v1.9.1.
+
+## 0029 — SHORTCUT and explicit deck selection (v2.0)
+
+Apply after 0001–0028. Adds the RX3 touch/encoder SHORTCUT panel, persistent local settings, validated read-only rekordbox MY SETTINGS imports, explicit deck selection targets and PERFORMANCE LOAD selection. The engine supports fractional quantization, hot-cue recall policy, jog response, fader curves, needle lock and routed beat-quantized effect activation. The RX3 range badge has a one-pixel text stroke and green/red/white/unboxed WIDE states. Skin and controller assets are installed alongside the native patch. See `docs/SHORTCUT-2.0-EN.md` for gestures, supported USB fields and hardware validation requirements.
+
+
+## 0030 — INFO, USB ratings and waveform samples (v2.0)
+
+Adds the native INFO page, highlighted Browse-row details, category Information
+Jump, saved load-source lists, and context-aware held encoder rating edits.
+Explicit rating writes validate session and track identity, atomically update the
+legacy DeviceSQL rating byte, keep one recovery copy and publish the new rating
+after success. Generic tag writers retain USB read-only protection. Desktop
+CUE GRID INFO import remains a separate physical round-trip check.
+
+Adds BLUE/RGB/3BAND samples drawn inside the existing SHORTCUT buttons. See
+[INFO-USB-2.0-EN.md](../docs/INFO-USB-2.0-EN.md) for behavior and primary sources.
+
+## 0031 — Emergency playback, precise tempo and SHORTCUT USB layout (v2.0)
+
+Apply after 0001–0030. Cache USB playback PCM for emergency loops, invalidate lost
+mounts, restrict affected deck transport and SYNC, allow recovery loads, and show
+per-deck unavailable-source presentation. Preserve precise constant PQTZ BPM while
+retaining changing grids. Keep discovery fingerprints current after rating writes.
+Leave the shared footer fully clear and group USB slot, name and settings rows.
+Controller SYNC assets are updated alongside this patch. See
+[EMERGENCY-SYNC-2.0-EN.md](../docs/EMERGENCY-SYNC-2.0-EN.md).
+
+## 0032 — Keep active loops when jumping to Hot Cues (v2.0)
+
+Apply after 0001–0031. Relocate the loop and hot-cue seek together in the audio
+callback. Beat loops retain their musical length; manually trimmed loops retain
+sample duration. Quantize snaps the destination and preserves playback phase,
+including sub-beat loops. Normal pad activation/release, explicit hot-cue jumps,
+paused preview and reverse keep the loop enabled. Saved loop recalls retain their
+own boundaries; relocating one through a normal hot cue leaves its stored cue
+unchanged. Seven native regressions cover these interactions.
+
+## 0033 — Complete empty-deck logo above waveform rows (v2.0)
+
+Apply after 0001–0032. Bind the empty-deck presentation to an exclusive
+logo/signal stack: hide the complete native signal page while both decks are
+empty, and select it when either deck loads. The skin separates deck information
+cards from that stack so they remain visible and interactive. This hides native
+OpenGL ancestors instead of relying on an alien logo's stacking order. Restore
+the correct page after countdown/INFO transitions. Two native regressions cover
+full-logo composition at 1280×800 and 1920×1080, either-deck loading/unloading,
+exclusive waveform visibility and delayed page restoration.
+
+## 0034 — Move the frameless RX3 window from its empty top margin (v2.0)
+
+Apply after 0001–0033. Handle left-button dragging only in the first 10 pixels
+of the window, excluding 10-pixel side insets and every child control. Listen
+on the existing canvas and SkinContainer margins without adding an overlay
+or changing REMAIN. Prefer native system movement and provide a mouse-grab
+fallback; stop on release/hide and exclude maximized/full-screen windows.
+Native regressions cover the hit area, REMAIN clicks and fallback movement.
+
+## 0035 — Persistent Beat FX Bank and momentary contextual X-PAD (v2.0)
+
+Apply after 0001–0034. Replace the skin's simultaneous effect selectors and
+deck-loop X-PAD connections with a native four-favorite Bank and horizontal
+touch/mouse pad. Save stable effect IDs immediately, preserve occupied and
+unavailable registrations, support targeted deletion, and recall via Unit 1's
+first effect slot. Touch enables and release/cancel disables the unit; view
+switching alone preserves activation. Select a contextual processor parameter,
+adapt beat/pitch cells and continuous gray-center rails, keep readouts synchronized
+and preserve engine quantization. Empty slots always open a curated performance-effect
+chooser, matching the RX3 selector; other skins retain their effect lists. Repair
+old utility favorites on explicit selection and preserve active parameters when
+registering the current processor. Keep selection independent of activation
+and outline selected favorites/parameter cells in white. Center the RX3 selector
+name and render the BEAT readout unit smaller than its value. Sixteen native
+regressions use real effect slots and parameters. The skin overlay supplies
+the placeholder, styling and dynamic right-hand time label. See
+[BEAT-FX-2.0-EN.md](../docs/BEAT-FX-2.0-EN.md) for supported processors and scope.
+
+
+## 0036 — Complete overview playing-address warning (v2.0)
+
+Apply after 0001–0035. Dim the entire horizontal address during the warning off
+phase, including its gray segment, rather than only hiding the small white
+remaining portion. Honor the existing Waveform EndOfTrackWarningTime setting;
+zero disables the warning. Keep the default 30-second threshold and faster
+cadence below 15 seconds. Native regressions cover threshold boundaries,
+TIME/REMAIN pixels, actual WOverview timer-driven paints and pause behavior.
+
+
+## 0037 — Native RX3 performance and encoder-operated USB workflows (v2.0)
+
+Apply after 0001–0036. Implement both Beat Loop tables, paused/playing Gate Cue,
+independent Release FX, safe asynchronous headphone preview, retained Memory
+Cues/Loops and Active Loop triggering. Add dedicated ANLZ performance writes,
+DeviceSQL playlist/history append operations and asynchronous MY SETTINGS SAVE
+with source/volume identity guards and recovery copies. Preserve unedited
+imported timing, unknown metadata and existing track rows.
+
+Add one shared encoder TOOLS contract for tags, four playlist favorites,
+combined filters, related keys, memory/performance saves, preview, REC and
+configured software audio paths. Add Auto Cue levels, originating-list CONTINUE,
+EJECT LOCK, guarded recorder commands and elapsed time. Add controller-independent
+microphone tone/low-cut and normal dB-based talkover, including supported USB
+mixer-setting fields. Use actual macOS
+filesystem information when the bundled Qt reports a different mounted volume.
+The controller/skin overlay supplies the pad controls and retains established
+Inpulse 500 gestures. See [scope and unfinished integration](../docs/RX3-WORKFLOW-2.0-EN.md).
+The patch does not implement Link Export or registered MATCHING pairs and does
+not complete the explicitly deferred Beat FX/Sound Color FX catalogs.
+
+
+## 0038 — Beat FX audio, exact timing and shared encoder controls (v2.0)
+
+Apply after 0037. Scope safe parameter initialization to explicit RX3 loads,
+open both FILTER cutoffs, enable REVERB send and use decay on its X-PAD.
+Add opt-in exact timing to ECHO/PHASER/TREMOLO while retaining legacy knob
+rounding by default. Extend ECHO to four beats/six seconds and TREMOLO to
+16 cycles per beat; advance both ECHO read heads even for an unchanged delay.
+
+Add held bank replacement and SOURCE → TOOLS → BEAT FX for common encoder selection,
+LEVEL / DEPTH, routing, AUTO/MANUAL/TAP tempo, momentary X-PAD and bank storage.
+Advance one beat/pitch cell per encoder tick and show its actual value. Keep
+TOOLS accessible without USB. Correct one-past-buffer dry addition.
+Forward the selected master deck's beat metadata to master effects and manual
+tempo/phase to unit 1. Add real processor audio and menu lifecycle regression
+coverage; preserve established controller mappings. The complete RX3 effect
+catalog remains deferred. See [controls](../docs/BEAT-FX-CONTROLS-EN.md).
+
+
+## 0039 — Encoder access to SHORTCUT CLOSE (v2.0)
+
+Apply after 0038. Include CLOSE immediately after TOOLS in SHORTCUT's shared
+encoder focus order, with the same white focus outline as other actions.
+Pressing the encoder closes SHORTCUT and restores the underlying page through
+the existing close path. Keep touch closing and controller gestures intact.
+Regression covers forward/backward focus, close activation, previous-page
+restoration and preserved deck settings through the common controller controls.
+
+
+## 0040 — Preserve RX3 overview colors at track end (v2.0)
+
+Apply after 0039. Skip the stock red end-of-track background and outline for
+RX3 overviews. Preserve playing-address blinking, its threshold and cadence,
+waveform shading, markers and transport behavior. Other skins retain their
+existing end-of-track colors. Native painting regression compares the complete
+RX3 image with the end flag on/off both near the end and at zero remaining,
+and checks that stock overviews still draw their red warning.
+
+
+## 0041 — USB-only SOURCE rows and encoder BACK in TOOLS (v2.0)
+
+Apply after 0040. Remove the synthetic TOOLS device row and its source-info
+presentation; preserve the top TOOLS button and the controller-accessible
+SHORTCUT TOOLS action. Include the existing BACK button after the last action
+in every common encoder tool menu, with blue focus feedback. Preserve edit
+completion, touch actions, direct back gestures and safe nested-menu callbacks.
+Regression exercises forward/reverse BACK focus, touch selection after BACK,
+empty menus and replacement callbacks, plus mouse-free SHORTCUT access to
+BEAT FX without a USB device. Established mappings remain unchanged.
+
+## 0042 — SOURCE MY SETTINGS and visible navigation (v2.0)
+
+Apply after 0041. Keep MY SETTINGS inside the right SOURCE panel, with LOAD,
+BACKGROUND COLOR, WAVEFORM COLOR and encoder-selectable BACK. Reuse the
+SHORTCUT loader without showing SHORTCUT, explicitly passing the panel's USB
+root. Expose SOURCE, BROWSE, TAG LIST, PLAYLIST, SEARCH and MENU above the
+full-width page title; source navigation resolves the highlighted USB first.
+Preserve the existing controller gestures and add common navigation commands.
+Turn past the USB rows to reach MY SETTINGS and the header actions. Render
+separate USB icon/label/arrow areas, and store the portable Nautic accent in
+its own JSON file without altering Pioneer settings or databases. Regression
+covers selected-source loading, missing files, SOURCE header order, encoder
+access without USB and per-device accent validation/preservation. The skin
+contains corresponding header/focus styles and mirrors the six navigation
+commands in PERFORMANCE's existing topbar outside this native patch.
+
+## 0043 — Separate UTILITY settings and transactional encoder editing (v2.0)
+
+- Keep MENU/TOOLS operation actions; hold MENU for UTILITY or select its
+  encoder-accessible TOOLS entry. Preserve the original PERFORMANCE topbar.
+- Add a two-column DECK/MIXER/GENERAL settings table with live values,
+  preview/apply/cancel editing, unavailable-setting explanations and BACK.
+- Reuse SHORTCUT controls and persist per-deck Auto Cue thresholds. Read live
+  headphones, deck settings, EQ and load policy; show mixed/custom values.
+- Fix empty-phrase data fallback to time-scale overview marks. Preserve the
+  browser return title and avoid a stale USB/playlist breadcrumb over menus.
+- Native tests cover held MENU release suppression, return state, touch and
+  encoder transactions, missing capability, live values and phrase fallback.
+- Full hardware UTILITY parity remains incomplete; see docs/UTILITY-2.0-EN.md.
+
+## 0044 — Unified UTILITY operations and stopwatch (v2.0)
+
+- Make MENU, the existing tools command and SHORTCUT's UTILITY button open
+  one grouped table. Retain established controller bindings.
+- Place all former TOOLS operations under DECK, MIXER, EFFECTS, BROWSER and
+  RECORDING; waveform options belong to DISPLAY and language/version to GENERAL.
+- Remove hardware-only and unimplemented RX3 placeholder rows. Actual audio
+  controls still require a configured input/output and retain their safeguards.
+- Reuse operation panels with live edits and preserve table focus, selected
+  USB/track/playlist context and correct return titles. Keep transactional
+  preview/apply/cancel for ordinary settings.
+- Match BROWSER's black/gray alternating rows and continuous gray divider.
+- Draw REMAIN's stopwatch as a scalable vector instead of a font glyph.
+- Native checks exercise all operation entry/return paths, unavailable-source
+  messages, action callback ownership, row colors/divider and existing FX editing.

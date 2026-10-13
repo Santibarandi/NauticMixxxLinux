@@ -158,6 +158,7 @@ DJCi500.rx3ToggleVinyl = function(deckData, midiStatus) {
     const deck = script.deckFromGroup(deckData.currentDeck);
     const enabled = !deckData.vinylButtonState[deck - 1];
     deckData.vinylButtonState[deck - 1] = enabled;
+    engine.setValue(deckData.currentDeck, "rx3_vinyl_mode", enabled ? 1 : 0);
     deckData.jogWheel.vinylMode = enabled;
     deckData.jogWheelShift.vinylMode = enabled;
     // Cancel the engine immediately; the default ramp can leave isScratching
@@ -270,6 +271,15 @@ DJCi500.rx3SoundColorFxButton = function(_channel, control, value) {
     DJCi500.rx3PaintSoundColorFx();
 };
 
+DJCi500.rx3SlipLoopHeld = {};
+DJCi500.rx3SlipLoopPad = function(group, pad, value, status) {
+    const beats = [0.0625, 0.125, 0.25, 0.5, 1, 2, 1/3, 0.75];
+    const held = (DJCi500.rx3SlipLoopHeld[group] || []).filter(function(index) { return index !== pad; });
+    if (value > 0 && (status & 0xF0) !== 0x80) held.push(pad);
+    DJCi500.rx3SlipLoopHeld[group] = held;
+    engine.setValue(group, "rx3_slip_loop", held.length ? beats[held[held.length-1]-1] : 0);
+};
+
 DJCi500.rx3ToggleSlip = function(deckData, value) {
     if (value !== 0x7F) {
         return;
@@ -292,12 +302,14 @@ DJCi500.rx3SyncButton = function(deckData, value, status) {
         return;
     }
 
+    if (engine.getValue(group, "rx3_source_lost")) { return; }
     const enabled = engine.getValue(group, "sync_enabled") !== 0;
     if (enabled) {
         engine.setValue(group, "sync_enabled", 0);
     } else {
         engine.setValue(group, "beatsync", 1);
         engine.setValue(group, "sync_enabled", 1);
+        engine.setValue(group, "beatsync_phase", 1);
     }
 };
 
@@ -589,7 +601,12 @@ DJCi500.rx3RefreshPadLeds = function(deckData) {
     const baseMode = ((mode - 1) % 4) + 1;
     const status = 0x95 + deckData.midiChannel;
 
-    if (mode === 1) {
+    if (mode === 2 || mode === 6) {
+        const buttons = mode === 2 ? deckData.loopButtons : deckData.loop2Buttons;
+        for (let i = 1; i <= 8; i++) buttons[i].trigger();
+        return;
+    }
+    if (mode === 1 || mode === 5) {
         // HotcueButton supplies the fixed RX3 marker color when assigned and
         // white when empty.
         for (let i = 1; i <= 8; i++) {
@@ -599,23 +616,45 @@ DJCi500.rx3RefreshPadLeds = function(deckData) {
     }
 
     const colors = DJCi500.rx3PadPalettes[mode];
+    const releasePad = mode === 7 ? Math.round(engine.getValue(deckData.currentDeck, "rx3_release_fx_active")) : 0;
     for (let i = 0; i < 8; i++) {
         const baseControl = (baseMode - 1) * 0x10 + i;
         const layerControl = (mode - 1) * 0x10 + i;
         // Update both firmware banks. This makes the paired layer work whether
         // it was reached by a repeated mode press or by the controller's legacy
         // SHIFT gesture.
-        midi.sendShortMsg(status, baseControl, colors[i]);
-        midi.sendShortMsg(status, baseControl + 0x08, colors[i]);
-        midi.sendShortMsg(status, layerControl, colors[i]);
-        midi.sendShortMsg(status, layerControl + 0x08, colors[i]);
+        midi.sendShortMsg(status, baseControl, (releasePad === i + 1 ? 0x7F : colors[i]));
+        midi.sendShortMsg(status, baseControl + 0x08, (releasePad === i + 1 ? 0x7F : colors[i]));
+        midi.sendShortMsg(status, layerControl, (releasePad === i + 1 ? 0x7F : colors[i]));
+        midi.sendShortMsg(status, layerControl + 0x08, (releasePad === i + 1 ? 0x7F : colors[i]));
     }
 };
 
+DJCi500.rx3GateHeld = {};
+DJCi500.rx3ReleaseFxHeld = {};
+DJCi500.rx3ReleaseOwnedPads = function(deckData, heldPads) {
+    for (const [key, held] of Object.entries(heldPads)) {
+        if (held.owner !== deckData.midiChannel) continue;
+        engine.setValue(held.group, held.control || `hotcue_${held.pad}_rx3_gate`, 0);
+        delete heldPads[key];
+    }
+};
 DJCi500.rx3SetPadMode = function(deckData, mode) {
+    if (deckData.activePadMode === 5 && mode !== 5) {
+        DJCi500.rx3ReleaseOwnedPads(deckData, DJCi500.rx3GateHeld);
+    }
+    if (deckData.activePadMode === 3 && mode !== 3) {
+        DJCi500.rx3SlipLoopHeld[deckData.currentDeck] = [];
+        engine.setValue(deckData.currentDeck, "rx3_slip_loop", 0);
+    }
+    if (deckData.activePadMode === 7 && mode !== 7) {
+        DJCi500.rx3ReleaseOwnedPads(deckData, DJCi500.rx3ReleaseFxHeld);
+        engine.setValue(deckData.currentDeck, "rx3_release_fx_cancel", 1);
+        engine.setValue(deckData.currentDeck, "rx3_release_fx_cancel", 0);
+    }
     deckData.activePadMode = mode;
     const deck = script.deckFromGroup(deckData.currentDeck);
-    DJCi500.slicerActive[deck - 1] = (mode === 3);
+    DJCi500.slicerActive[deck - 1] = false;
     // Publish the logical layer to the skin. Each physical deck owns an
     // independent 1-8 stack, matching the two-layer PAD MODE buttons.
     const padModeGroup = deckData.midiChannel === 1 ?
@@ -636,6 +675,19 @@ DJCi500.rx3PadInput = function(_channel, control, value, status, _group) {
     const physicalMode = Math.floor(control / 0x10) + 1;
     const pad = (control & 0x07) + 1;
     const shiftedPad = (control & 0x08) !== 0;
+    const pressed = value > 0 && (status & 0xF0) !== 0x80;
+    const heldKey = `${deckData.midiChannel}:${pad}`;
+    // A release belongs to the deck/control captured at press time, even if
+    // SHIFT, the visible deck or the firmware bank changed in the meantime.
+    if (!pressed) {
+        for (const heldPads of [DJCi500.rx3GateHeld, DJCi500.rx3ReleaseFxHeld]) {
+            const held = heldPads[heldKey];
+            if (!held) continue;
+            engine.setValue(held.group, held.control || `hotcue_${held.pad}_rx3_gate`, 0);
+            delete heldPads[heldKey];
+            return;
+        }
+    }
     const pairedBase = ((deckData.activePadMode - 1) % 4) + 1;
     if (physicalMode > 4 && deckData.activePadMode !== physicalMode) {
         // A firmware SHIFT bank is inert unless its matching selector was
@@ -651,40 +703,32 @@ DJCi500.rx3PadInput = function(_channel, control, value, status, _group) {
         deckData.hotcueButtons[pad].input(_channel, targetControl, value, status, deckData.currentDeck);
         break;
     case 2:
-        (shiftedPad ? deckData.loopShiftButtons[pad] : deckData.loopButtons[pad])
+        deckData.loopButtons[pad]
             .input(_channel, targetControl, value, status, deckData.currentDeck);
         break;
     case 3:
-        deckData.slicerButtons[pad].input(_channel, targetControl, value, status, deckData.currentDeck);
+        DJCi500.rx3SlipLoopPad(deckData.currentDeck, pad, value, status);
         break;
     case 4:
         DJCi500.rx3BeatJumpPadInput(deckData, mode, pad, value, status, control);
         break;
     case 5: {
-        const pitchPads = [
-            deckData.pitchDownTone,
-            deckData.pitchDownSemiTone,
-            deckData.pitchUpSemiTone,
-            deckData.pitchUpTone,
-            deckData.pitchSliderReset,
-            deckData.pitchSliderDecrease,
-            deckData.pitchSliderIncrease,
-        ];
-        if (pad === 8) {
-            if (value === 0x7F) {
-                script.toggleControl(deckData.currentDeck, "keylock");
-            }
-        } else {
-            pitchPads[pad - 1].input(_channel, targetControl, value, status, deckData.currentDeck);
-        }
+        if (!pressed) break;
+        const target = `hotcue_${pad}_${shiftedPad ? "clear" : "rx3_gate"}`;
+        DJCi500.rx3GateHeld[heldKey] = {owner: deckData.midiChannel, group: deckData.currentDeck, pad, control: target};
+        engine.setValue(deckData.currentDeck, target, 1);
         break;
     }
     case 6:
-        deckData.rollButtons[pad].input(_channel, targetControl, value, status, deckData.currentDeck);
+        deckData.loop2Buttons[pad].input(_channel, targetControl, value, status, deckData.currentDeck);
         break;
-    case 7:
-        deckData.effectButtons[pad].input(_channel, targetControl, value, status, deckData.currentDeck);
+    case 7: {
+        if (!pressed) break;
+        const target = `rx3_release_fx_${pad}${shiftedPad || deckData.isShiftPressed ? "_latch" : ""}`;
+        DJCi500.rx3ReleaseFxHeld[heldKey] = {owner: deckData.midiChannel, group: deckData.currentDeck, pad, control: target};
+        engine.setValue(deckData.currentDeck, target, 1);
         break;
+    }
     case 8:
         DJCi500.rx3BeatJumpPadInput(deckData, mode, pad, value, status, control);
         break;
@@ -808,34 +852,6 @@ DJCi500.numberIndicator = function(value, group, _control) {
     }
 };
 
-DJCi500.fxSelIndicator = function(_value, group, _control, _status) {
-    if (group === "[EffectRack1_EffectUnit1]") {
-        if (DJCi500.deckA.activePadMode === 7) {
-            midi.sendShortMsg(0x96, 0x63, 0x7F);
-        }
-        if (DJCi500.deckB.activePadMode === 7) {
-            midi.sendShortMsg(0x97, 0x63, 0x7F);
-        }
-    } else if (group === "[EffectRack1_EffectUnit2]") {
-        if (DJCi500.deckA.activePadMode === 7) {
-            midi.sendShortMsg(0x96, 0x67, 0x7F);
-        }
-        if (DJCi500.deckB.activePadMode === 7) {
-            midi.sendShortMsg(0x97, 0x67, 0x7F);
-        }
-    }
-};
-
-DJCi500.fxEnabledIndicator = function(_value, group, _control, _status) {
-    const deckA = DJCi500.deckA.currentDeck;
-    const deckB = DJCi500.deckB.currentDeck;
-    if (group === `[QuickEffectRack1_${deckA}]` && DJCi500.deckA.activePadMode === 7) {
-        midi.sendShortMsg(0x96, 0x66, 0x7F);
-    } else if (group === `[QuickEffectRack1_${deckB}]` && DJCi500.deckB.activePadMode === 7) {
-        midi.sendShortMsg(0x97, 0x66, 0x7F);
-    }
-};
-
 DJCi500.Deck = function(deckNumbers, midiChannel) {
     components.Deck.call(this, deckNumbers);
     // Allow components to access deck variables
@@ -846,7 +862,8 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
     this.loopAdjustMode = null;
 
     // For loop and looprolls
-    const fractions = ["0.125", "0.25", "0.5", "1", "2", "4", "8", "16"];
+    const fractions = ["0.25", "0.5", "1", "2", "4", "8", "16", "32"];
+    const loop2Fractions = ["0.75", "1", "1.5", "3", "5", "6", "7", "9"];
     const shiftFractions = ["0.03125", "0.0625", "32", "64", "128", "256", "512", "512"];
 
     // Brake status for this deck
@@ -894,6 +911,7 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
     // Transport section
     // Play button, for some reason the group is not correct on this one?
     this.playButton = new components.PlayButton({
+        outKey: "slip_play_indicator",
         midi: [0x90 + midiChannel, 0x07],
         shiftOffset: 3,
         shiftControl: false,
@@ -953,6 +971,16 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
     // Vinyl button
     this.vinylButton = new components.Button({
         midi: [0x90 + midiChannel, 0x03],
+        outKey: "rx3_vinyl_mode",
+        output: function(value, group) {
+            const deck = script.deckFromGroup(group);
+            const enabled = value > 0;
+            deckData.vinylButtonState[deck - 1] = enabled;
+            if (deckData.jogWheel) deckData.jogWheel.vinylMode = enabled;
+            if (deckData.jogWheelShift) deckData.jogWheelShift.vinylMode = enabled;
+            if (!enabled && engine.isScratching(deck)) engine.scratchDisable(deck, false);
+            this.send(enabled ? 0x7F : 0x00);
+        },
         shiftOffset: 3,
         shiftControl: false,
         shiftChannel: true,
@@ -980,7 +1008,7 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
     // SLIP mode button
     this.slipButton = new components.Button({
         midi: [0x90 + midiChannel, 0x01],
-        outKey: "slip_enabled",
+        outKey: "slip_indicator",
         input: function(_channel, _control, value, _status, _group) {
             DJCi500.rx3ToggleSlip(deckData, value);
         },
@@ -1042,7 +1070,6 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
         inputWheel: function(_channel, _control, value, _status, _group) {
             const deck = script.deckFromGroup(deckData.currentDeck);
             value = this.inValueScale(value);
-            DJCi500.rx3SelectDeck(deckData);
             if (DJCi500.rx3GridActive()) return;
             if (DJCi500.rx3AdjustLoopPoint(deckData, value, this.wheelResolution)) {
                 return;
@@ -1060,7 +1087,6 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
         },
         inputTouch: function(_channel, _control, value, _status, _group) {
             const deck = script.deckFromGroup(deckData.currentDeck);
-            DJCi500.rx3SelectDeck(deckData);
             if (DJCi500.rx3GridActive() || deckData.loopAdjustMode !== null) {
                 if (engine.isScratching(deck)) {
                     engine.scratchDisable(deck);
@@ -1093,7 +1119,6 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
         group: `[Channel${midiChannel}]`,
         inputWheel: function(_channel, _control, value, _status, _group) {
             const tickDelta = this.inValueScale(value);
-            DJCi500.rx3SelectDeck(deckData);
             if (DJCi500.rx3GridActive()) return;
             DJCi500.rx3FastSeek(deckData.currentDeck, tickDelta, this.wheelResolution);
         },
@@ -1218,8 +1243,14 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
             output: function(value, group, control) {
                 // Do not let a background hot-cue update repaint logical
                 // mode 5, which shares the same physical pad bank.
-                if (deckData.activePadMode === 1) {
-                    components.HotcueButton.prototype.output.call(this, value, group, control);
+                if (deckData.activePadMode === 1 || deckData.activePadMode === 5) {
+                    if (value > 0 && engine.getValue(group, "slip_enabled") &&
+                            engine.getValue(group, "slip_flashing") &&
+                            !engine.getValue(group, "slip_flash_indicator")) {
+                        this.send(0);
+                    } else {
+                        components.HotcueButton.prototype.output.call(this, value, group, control);
+                    }
                 }
             },
         });
@@ -1235,6 +1266,7 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
             sendShifted: false,
             on: 0x74,
             off: 0x74,
+            output: function(value) { if (deckData.activePadMode === 2) this.send(value > 0 ? 0x7F : 0x74); },
             outKey: `beatloop_${fractions[i - 1]}_enabled`,
             inKey: `beatloop_${fractions[i - 1]}_toggle`,
         });
@@ -1375,138 +1407,22 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
         },
     });
 
-    // Beatloop rolls buttons (PAD Mode 6)
-    this.rollButtons = [];
+    // RX3 second Beat Loop table: persistent loops, not rolls.
+    this.loop2Buttons = [];
     for (let i = 1; i <= 8; i++) {
-        this.rollButtons[i] = new components.Button({
+        this.loop2Buttons[i] = new components.Button({
             midi: [0x95 + midiChannel, 0x50 + (i - 1)],
-            number: i,
-            shiftOffset: 8,
-            shiftControl: true,
-            sendShifted: true,
-            on: 0x74,
-            off: 0x74,
-            key: `beatlooproll_${fractions[i - 1]}_activate`,
+            number: i, shiftOffset: 8, sendShifted: true,
+            output: function(value) { if (deckData.activePadMode === 6) this.send(value > 0 ? 0x7F : 0x74); },
+            outKey: `beatloop_${loop2Fractions[i - 1]}_enabled`,
+            inKey: `beatloop_${loop2Fractions[i - 1]}_toggle`,
         });
-    };
+    }
 
-    // Effect buttons (PAD Mode 7)
-    this.effectButtons = [];
-    for (let i = 1; i <= 3; i++) {
-        // First top row effects buttons, just the effect, disable HPF/LPF knob
-        this.effectButtons[i] = new components.Button({
-            midi: [0x95 + midiChannel, 0x60 + (i - 1)],
-            number: i,
-            shiftOffset: 8,
-            shiftControl: true,
-            sendShifted: true,
-            group: `[EffectRack1_EffectUnit${midiChannel}_Effect${i}]`,
-            outKey: "enabled",
-            output: function(_value, _group, _control) {
-                this.send(0x7F);
-            },
-            unshift: function() {
-                // Normal effect button operation, toggling the effect assigned to it
-                this.input = function(channel, control, value, _status, _group) {
-                    if (value === 0x7F) {
-                        script.toggleControl(this.group, "enabled");
-                    }
-                };
-            },
-            shift: function() {
-                // Shift button will change the effect to the next in the list
-                this.input = function(channel, control, value, _status, _group) {
-                    if (value === 0x7F) {
-                        engine.setValue(this.group, "effect_selector", +1);
-                    }
-                };
-            }
-        });
-    };
-
-    // Effect chain selectors
-    this.effectButtons[5] = new components.Button({
-        midi: [0x95 + midiChannel, 0x64],
-        number: 5,
-        shiftOffset: 8,
-        shiftControl: true,
-        sendShifted: true,
-        group: `[QuickEffectRack1_[Channel${midiChannel}]]`,
-        on: 0x7F,
-        off: 0x7F,
-        input: function(channel, control, value, status, _group) {
-            if (value === 0x7F) {
-                engine.setValue(this.group, "chain_preset_selector", -1);
-                midi.sendShortMsg(status, control, this.on); //17 -- 3B
-            } else {
-                midi.sendShortMsg(status, control, this.off); //3B -- 33
-            }
-        }
-    });
-
-    this.effectButtons[6] = new components.Button({
-        midi: [0x95 + midiChannel, 0x65],
-        number: 6,
-        shiftOffset: 8,
-        shiftControl: true,
-        sendShifted: true,
-        group: `[QuickEffectRack1_[Channel${midiChannel}]]`,
-        on: 0x7F,
-        off: 0x7F,
-        input: function(channel, control, value, status, _group) {
-            if (value === 0x7F) {
-                engine.setValue(this.group, "chain_preset_selector", 1);
-                midi.sendShortMsg(status, control, this.on); //17 -- 3B
-            } else {
-                midi.sendShortMsg(status, control, this.off); //3B -- 33
-            }
-        }
-    });
-
-    // Filter kill switch
-    this.effectButtons[7] = new components.Button({
-        midi: [0x95 + midiChannel, 0x66],
-        number: 4,
-        shiftOffset: 8,
-        shiftControl: true,
-        sendShifted: true,
-        group: `[QuickEffectRack1_[Channel${midiChannel}]]`,
-        input: function(_channel, _control, value, _status, _group) {
-            if (value === 0x7F) {
-                script.toggleControl(this.group, "enabled");
-            }
-        }
-    });
-
-    // Set the current channel FX route with the two extra PADs
-    this.effectButtons[4] = new components.Button({
-        midi: [0x95 + midiChannel, 0x63],
-        number: 4,
-        shiftOffset: 8,
-        shiftControl: true,
-        sendShifted: true,
-        group: "[EffectRack1_EffectUnit1]",
-        input: function(channel, _control, value, _status, _group) {
-            if (value === 0x7F) {
-                const deckGroup = deckData.currentDeck;
-                script.toggleControl(this.group, `group_${deckGroup}_enable`);
-            }
-        }
-    });
-
-    this.effectButtons[8] = new components.Button({
-        midi: [0x95 + midiChannel, 0x67],
-        number: 8,
-        shiftOffset: 8,
-        shiftControl: true,
-        sendShifted: false,
-        group: "[EffectRack1_EffectUnit2]",
-        input: function(_channel, _control, value, _status, _group) {
-            if (value === 0x7F) {
-                const deckGroup = deckData.currentDeck;
-                script.toggleControl(this.group, `group_${deckGroup}_enable`);
-            }
-        }
+    // Release FX feedback follows native per-deck state and never generic FX units.
+    this.releaseFxFeedback = new components.Button({
+        group: this.currentDeck, outKey: "rx3_release_fx_active",
+        output: function() { if (deckData.activePadMode === 7) DJCi500.rx3RefreshPadLeds(deckData); },
     });
 
     // Filter knob is here since it is affected by effects pads
@@ -1546,6 +1462,15 @@ DJCi500.Deck = function(deckNumbers, midiChannel) {
                 deckData.padLoadRefreshTimer = 0;
                 DJCi500.rx3RefreshPadLeds(deckData);
             }, true);
+        },
+    });
+
+    this.slipPadFlash = new components.Component({
+        outKey: "slip_flash_indicator",
+        output: function() {
+            if (deckData.activePadMode === 1 || deckData.activePadMode === 5) {
+                DJCi500.rx3RefreshPadLeds(deckData);
+            }
         },
     });
 
@@ -1604,19 +1529,7 @@ DJCi500.init = function() {
     engine.getValue("[Main]", "vu_meter_right");
 
     // Connect the FX selection leds
-    engine.makeConnection("[EffectRack1_EffectUnit1]", "group_[Channel1]_enable", DJCi500.fxSelIndicator);
-    engine.makeConnection("[EffectRack1_EffectUnit2]", "group_[Channel1]_enable", DJCi500.fxSelIndicator);
-    engine.makeConnection("[EffectRack1_EffectUnit1]", "group_[Channel2]_enable", DJCi500.fxSelIndicator);
-    engine.makeConnection("[EffectRack1_EffectUnit2]", "group_[Channel2]_enable", DJCi500.fxSelIndicator);
-    engine.makeConnection("[EffectRack1_EffectUnit1]", "group_[Channel3]_enable", DJCi500.fxSelIndicator);
-    engine.makeConnection("[EffectRack1_EffectUnit2]", "group_[Channel3]_enable", DJCi500.fxSelIndicator);
-    engine.makeConnection("[EffectRack1_EffectUnit1]", "group_[Channel4]_enable", DJCi500.fxSelIndicator);
-    engine.makeConnection("[EffectRack1_EffectUnit2]", "group_[Channel4]_enable", DJCi500.fxSelIndicator);
 
-    engine.makeConnection("[QuickEffectRack1_[Channel1]]", "enabled", DJCi500.fxEnabledIndicator);
-    engine.makeConnection("[QuickEffectRack1_[Channel2]]", "enabled", DJCi500.fxEnabledIndicator);
-    engine.makeConnection("[QuickEffectRack1_[Channel3]]", "enabled", DJCi500.fxEnabledIndicator);
-    engine.makeConnection("[QuickEffectRack1_[Channel4]]", "enabled", DJCi500.fxEnabledIndicator);
 
     // Connect the slicer beats
     DJCi500.slicerBeat1 = engine.makeConnection("[Channel1]", "beat_active", DJCi500.slicerBeatActive);
@@ -1665,8 +1578,8 @@ DJCi500.init = function() {
     // PortMidi is still opening during the first synchronous LED messages.
     // Repaint every RX3 state after it is ready so no lamp depends on that race.
     engine.beginTimer(500, function() {
-        midi.sendShortMsg(0x91, 0x03, DJCi500.initialVinylMode ? 0x7F : 0x00);
-        midi.sendShortMsg(0x92, 0x03, DJCi500.initialVinylMode ? 0x7F : 0x00);
+        DJCi500.deckA.vinylButton.trigger();
+        DJCi500.deckB.vinylButton.trigger();
         midi.sendShortMsg(0x90, 0x05, 0x10);
         DJCi500.rx3PaintSoundColorFx();
         DJCi500.deckA.syncButton.trigger();
@@ -1678,11 +1591,7 @@ DJCi500.init = function() {
     }, true);
 
     // Update the fx rack selection
-    DJCi500.fxSelIndicator(0, "[EffectRack1_EffectUnit1]", 0, 0);
-    DJCi500.fxSelIndicator(0, "[EffectRack1_EffectUnit2]", 0, 0);
 
-    DJCi500.fxEnabledIndicator(0, "[QuickEffectRack1_[Channel1]]", 0, 0);
-    DJCi500.fxEnabledIndicator(0, "[QuickEffectRack1_[Channel2]]", 0, 0);
 };
 
 // Crossfader control, set the curve
@@ -1767,7 +1676,7 @@ DJCi500.rx3OpenBrowse = function() {
 // Rotary selector press: open BROWSE first, then toggle navigation focus.
 // Folder tree -> selected folder / track list -> folder tree. The action is
 // performed on release so press+turn can still page-jump.
-DJCi500.rx3BrowserPush = function(_channel, _control, value, _status, _group) {
+DJCi500.rx3BrowserLegacyPush = function(_channel, _control, value, _status, _group) {
     if (value > 0 && (_status & 0xF0) !== 0x80) {
         if (DJCi500.rx3BrowserPressed || Date.now() < DJCi500.rx3BrowserIgnoreUntil) {
             return;
@@ -1818,7 +1727,7 @@ DJCi500.rx3BrowserPush = function(_channel, _control, value, _status, _group) {
 };
 
 // SHIFT + rotary selector press acts as the RX3 BACK button.
-DJCi500.rx3BrowserBack = function(_channel, _control, value, _status, _group) {
+DJCi500.rx3BrowserNavigateBack = function(_channel, _control, value, _status, _group) {
     if (value === 0 || (_status & 0xF0) === 0x80) {
         return;
     }
@@ -1867,6 +1776,14 @@ DJCi500.rx3LoadTrack = function(_channel, _control, value, status, group) {
         targetDeck = DJCi500.deckB.currentDeck;
     }
 
+    if (Math.round(engine.getValue("[Tab]", "current")) === 0) {
+        if (value > 0 && (status & 0xF0) !== 0x80) {
+            const deck = targetDeck === "[Channel2]" ? 2 : targetDeck === "[Channel1]" ? 1 : 0;
+            if (deck) engine.setValue("[RX3Controller]", "active_deck", deck);
+        }
+        return;
+    }
+    if (engine.getValue("[RX3Shortcut]", "visible") > 0) return;
     engine.setValue(targetDeck, "LoadSelectedTrack", value > 0 ? 1 : 0);
 };
 
@@ -1874,7 +1791,7 @@ DJCi500.rx3LoadTrack = function(_channel, _control, value, status, group) {
 // - PERFORMANCE: zoom both visible deck waveforms without opening BROWSE.
 // - BROWSE: preserve the RX3-style library navigation behavior.
 // Pressing the encoder remains the only way a normal turn can enter BROWSE.
-DJCi500.moveLibrary = function(channel, control, value, _status, _group) {
+DJCi500.rx3MoveLibraryLegacy = function(channel, control, value, _status, _group) {
     const movingUp = value > 0x3F;
     const browseIsOpen = Math.round(engine.getValue("[Tab]", "current")) === 1;
 
@@ -2082,15 +1999,13 @@ DJCi500.updateDeckStatus = function(group) {
     } else {
         vinylState = DJCi500.deckB.vinylButtonState[deckIndex];
     }
+    vinylState = engine.getValue(group, "rx3_vinyl_mode") > 0;
     midi.sendShortMsg(0x90 + channel, 0x03, (vinylState) ? 0x7F : 0x00);
     midi.sendShortMsg(0xB0 + channel, 0x40, volume);
     midi.sendShortMsg(0x90 + channel, 0x30, playing ? 0x7F : 0x00);
 
     // Update the fx rack selection
-    DJCi500.fxSelIndicator(0, "[EffectRack1_EffectUnit1]", 0, 0);
-    DJCi500.fxSelIndicator(0, "[EffectRack1_EffectUnit2]", 0, 0);
 
-    DJCi500.fxEnabledIndicator(0, `[QuickEffectRack1_${group}]`, 0, 0);
 
     // Slicer
     switch (group) {
@@ -2241,6 +2156,7 @@ DJCi500.slicerBeatActive = function(value, group, _control) {
 };
 
 DJCi500.shutdown = function() {
+    if (typeof NauticRX3Encoder !== "undefined") NauticRX3Encoder.shutdown();
     DJCi500.rx3CancelAssistantTimer();
     DJCi500.rx3AssistantPressed = false;
     DJCi500.rx3AssistantCanExit = false;
@@ -2248,6 +2164,10 @@ DJCi500.shutdown = function() {
     DJCi500.rx3BrowserPressed = false;
     DJCi500.rx3SetGridMode(false);
     [DJCi500.deckA, DJCi500.deckB].forEach(function(deckData) {
+        if (deckData) {
+            DJCi500.rx3ReleaseOwnedPads(deckData, DJCi500.rx3GateHeld);
+            DJCi500.rx3ReleaseOwnedPads(deckData, DJCi500.rx3ReleaseFxHeld);
+        }
         if (deckData && deckData.padLoadRefreshTimer) {
             engine.stopTimer(deckData.padLoadRefreshTimer);
             deckData.padLoadRefreshTimer = 0;
@@ -2268,4 +2188,30 @@ DJCi500.shutdown = function() {
     }
     midi.sendShortMsg(0xB0, 0x7F, 0x7E);
 
+};
+
+// v2.0 encoder adapter. Both normal and shifted MIDI releases reach the same
+// gesture state, so crossing SHIFT while held cannot execute a second action.
+DJCi500.rx3EncoderBackend = {
+    isOpen: function() {return Math.round(engine.getValue("[Tab]", "current")) === 1;},
+    shortPress: function() {
+        DJCi500.rx3BrowserLegacyPush(0, 0, 127, 0x90);
+        DJCi500.rx3BrowserLegacyPush(0, 0, 0, 0x80);
+    },
+    back: function() {DJCi500.rx3BrowserNavigateBack(0, 0, 127, 0x93);},
+    originalTurn: function(c, k, v, s, g) {
+        DJCi500.rx3BrowserPressed = NauticRX3Encoder.pressed;
+        DJCi500.rx3MoveLibraryLegacy(c, k, v, s, g);
+        DJCi500.rx3BrowserPressed = false;
+    },
+    setGrid: DJCi500.rx3SetGridMode
+};
+DJCi500.rx3BrowserPush = function(c, k, v, s, g) {
+    NauticRX3Encoder.press(DJCi500.rx3EncoderBackend, v, s, false);
+};
+DJCi500.rx3BrowserBack = function(c, k, v, s, g) {
+    NauticRX3Encoder.press(DJCi500.rx3EncoderBackend, v, s, true);
+};
+DJCi500.moveLibrary = function(c, k, v, s, g) {
+    NauticRX3Encoder.turn(DJCi500.rx3EncoderBackend, c, k, v, s, g);
 };

@@ -158,8 +158,8 @@ PioneerDDJSX2.doTimer=function() {
     midi.sendSysexMsg(PioneerDDJSX2.serato,PioneerDDJSX2.serato.length);
   }
   for (var i=0; i<4; i++) {
-    if (engine.getValue("[Channel"+(i+1)+"]","slip_enabled")) {
-      midi.sendShortMsg(0x90+i,0x40,PioneerDDJSX2.tiltstatus?0x7F:0x00);
+    if (engine.getValue("[Channel"+(i+1)+"]","slip_indicator")) {
+      midi.sendShortMsg(0x90+i,0x40,0x7F);
     } else {
       midi.sendShortMsg(0x90+i,0x40,0x00);
     }

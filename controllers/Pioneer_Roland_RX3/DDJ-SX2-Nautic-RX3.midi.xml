@@ -9,6 +9,7 @@
         <scriptfiles>
             <file functionprefix="PioneerDDJSX2" filename="PIONEER_DDJ-SX2-scripts.js" />
             <file functionprefix="NauticRX3Browser" filename="Nautic-RX3-Browser.js" />
+            <file functionprefix="NauticRX3Encoder" filename="Nautic-RX3-Encoder-Pioneer-Roland.js" />
         </scriptfiles>
         <controls>
             <control>
@@ -6106,11 +6107,11 @@
             </control>
             <control>
                 <group>[Channel2]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play7</key>
                 <status>0x91</status>
                 <midino>0x66</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
@@ -6124,20 +6125,20 @@
             </control>
             <control>
                 <group>[Channel1]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play8</key>
                 <status>0x90</status>
                 <midino>0x66</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play9</key>
                 <status>0x93</status>
                 <midino>0x66</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
@@ -6160,11 +6161,11 @@
             </control>
             <control>
                 <group>[Channel3]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play10</key>
                 <status>0x92</status>
                 <midino>0x66</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
@@ -6628,11 +6629,11 @@
             </control>
             <control>
                 <group>[Channel2]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play11</key>
                 <status>0x91</status>
                 <midino>0x0B</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
@@ -6646,20 +6647,20 @@
             </control>
             <control>
                 <group>[Channel1]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play12</key>
                 <status>0x90</status>
                 <midino>0x0B</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play13</key>
                 <status>0x93</status>
                 <midino>0x0B</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
@@ -6673,11 +6674,11 @@
             </control>
             <control>
                 <group>[Channel3]</group>
-                <key>play</key>
+                <key>NauticRX3Encoder.play14</key>
                 <status>0x92</status>
                 <midino>0x0B</midino>
                 <options>
-                    <normal />
+                    <script-binding />
                 </options>
             </control>
             <control>
