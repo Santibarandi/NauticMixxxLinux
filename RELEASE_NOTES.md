@@ -51,6 +51,7 @@
 - Make short SYNC presses on FLX4 and DDJ-400 retain synchronization. RX3 controller mappings request phase alignment explicitly when enabling SYNC, including with Quantize off. Accuracy still depends on a correctly analyzed beatgrid.
 - Jumping to a normal HOT CUE relocates the active loop without disabling it. Beat loops retain their beat count, manually trimmed loops retain their exact duration, and Quantize preserves playback phase. Moving an active saved loop does not rewrite the stored cue.
 - Show the complete centered NauticMixxx logo while both decks are empty, with the entire main-waveform container hidden. Loading either deck switches to the waveform page. Keep deck cards visible and restore the correct page after timer/INFO transitions.
+- Correct MY SETTINGS saves on Windows while retaining USB identity checks, atomic replacement and recovery copies.
 - New profiles continue to start in English. Integrated updates and USB-session provenance safeguards are retained.
 
 Available for macOS Apple Silicon and Windows x64. The macOS build is ad-hoc signed and is not Apple-notarized. Physical controller and RX3 audio calibration remain pending; deferred features are documented above.

@@ -2,6 +2,8 @@
 
 ## 2.0.0 — 2026-10-13
 
+- Correct Windows MY SETTINGS atomic saves by releasing validation handles before replacing files; configure standalone native logo-test resources explicitly.
+
 - Integrate the existing TOOLS operations into UTILITY, grouped as DECK, MIXER, EFFECTS, BROWSER, RECORDING, DISPLAY and GENERAL. MENU and established controller gestures open the unified table. Use BROWSER’s black/gray rows and gray column divider; restore the selected row on submenu return. Remove hardware-only and unimplemented placeholder rows. Keep live shared settings and preview/apply/cancel editing, per-deck Auto Cue persistence and time-scale fallback when phrase data is absent. Replace the REMAIN font symbol with a scalable vector stopwatch.
 - Add the separate SOURCE MY SETTINGS panel with LOAD, BACKGROUND COLOR and WAVEFORM COLOR. Expose SOURCE, BROWSE, TAG LIST, PLAYLIST, SEARCH and MENU in the BROWSE/SOURCE header; preserve the original PERFORMANCE topbar; use the highlighted SOURCE USB for navigation and settings loading. Keep controller gestures and SHORTCUT access unchanged. Save Nautic USB accents separately from rekordbox files.
 - Remove the large TOOLS entry from the SOURCE device list; retain header/SHORTCUT access and make the existing BACK button selectable after the last action in every encoder tool menu.

@@ -1,88 +1,82 @@
-# NauticMixxx 2.0.0
+<p align="center">
+  <img src="branding/readme/hero-2.0.svg" width="100%" alt="NauticMixxx 2.0 — Your USB. Your set.">
+</p>
 
-Version 2.0.0 adds unified UTILITY and SHORTCUT controls, SOURCE MY SETTINGS,
-Beat FX favorites and X-PAD, USB performance saves, emergency playback and
-precise rekordbox synchronization. Available for macOS Apple Silicon and Windows x64.
-See the [release notes](RELEASE_NOTES.md) and [RX3 workflow guide](docs/RX3-WORKFLOW-2.0-EN.md).
-Version [1.9.1](https://github.com/nauticsoftware/NauticMixxx/releases/tag/v1.9.1) remains available as a fallback.
+<p align="center">
+  An open-source DJ workspace built around rekordbox USB exports.<br>
+  Two decks. An RX3-inspired interface. Native macOS and Windows apps.
+</p>
 
-![NauticMixxx2](branding/NauticMixxx2.png)
-![NauticMixxx](branding/NauticMixxx_Home.png)
-![NauticMixxx](branding/NauticMixxx_Performance.png)
+<p align="center">
+  <a href="https://github.com/nauticsoftware/NauticMixxx/releases/tag/v2.0.0"><strong>Download 2.0.0</strong></a>
+  &nbsp; · &nbsp;
+  <a href="RELEASE_NOTES.md">What's new</a>
+  &nbsp; · &nbsp;
+  <a href="docs/INSTALLATION-EN.md">Installation</a>
+  &nbsp; · &nbsp;
+  <a href="docs/RX3-WORKFLOW-2.0-EN.md">Workflow guide</a>
+</p>
 
-NauticMixxx is an open-source community edition of Mixxx 2.5.6. It brings an XDJ-RX3-inspired two-deck display to Mixxx, with a dedicated Hercules DJControl Inpulse 500 mapping.
+---
 
-## Features
+## Get NauticMixxx 2.0
 
-- Scalable PERFORMANCE, BROWSE and STATUS views with stacked waveforms, beatgrid, overviews and eight Hot Cues per deck.
-- Rekordbox USB browsing and loading in the native NauticMixxx app. Its local music-folder browser and scanner are disabled.
-- Hercules DJControl Inpulse 500 mapping with RX3-style browser and loop controls.
-- Optional DDJ-FLX4 mapping with RX3 browser controls. Its bindings passed software validation; physical hardware validation is pending. See the [DDJ-FLX4 guide](docs/DDJ-FLX4-EN.md).
-- v1.5 presets add mouse-free RX3 browsing for DDJ-400, DDJ-SX, DDJ-SX2, DDJ-SX3, DDJ-WeGO3 and Roland DJ-505; see the [controller guide](docs/CONTROLLERS-RX3-1.5-EN.md). Hardware validation is pending.
-- Optional DDJ-FLX6 **browser-only** preset for VIEW, SOURCE, BROWSE, BACK and LOAD 1/2. It does not replace a full controller mapping; see the [DDJ-FLX6 guide](docs/DDJ-FLX6-EN.md).
-- Four Sound Color FX, NauticMixxx branding, reproducible patches, tests and release checksums.
-- Unified UTILITY adds shared encoder-operated controls, Gate Cue, both Beat Loop tables, independent Release FX, memory cues/Active Loops, USB performance saves, playlist/history creation, preview and REC. See [implemented scope and remaining work](docs/RX3-WORKFLOW-2.0-EN.md).
+| macOS | Windows |
+| :--- | :--- |
+| **Apple Silicon · arm64** | **Windows 10 / 11 · x64** |
+| [Download the DMG](https://github.com/nauticsoftware/NauticMixxx/releases/download/v2.0.0/NauticMixxx-2.0.0-macOS-arm64.dmg) | [Download the installer](https://github.com/nauticsoftware/NauticMixxx/releases/download/v2.0.0/NauticMixxx-2.0.0-Windows-x64-Setup.exe) |
+| Open the image and drag the app to Applications. | Run the installer. The complete native app is included. |
 
-## Download and install
+Existing users can install through the signed integrated updater. New profiles start in English.
+The macOS community build is ad-hoc signed and is not Apple-notarized; see the [first-launch instructions](docs/INSTALLATION-EN.md).
 
-Download NauticMixxx 2.0.0 from the [release page](https://github.com/nauticsoftware/NauticMixxx/releases/tag/v2.0.0):
+## A clear view of your set
 
-- [macOS Apple Silicon DMG](https://github.com/nauticsoftware/NauticMixxx/releases/download/v2.0.0/NauticMixxx-2.0.0-macOS-arm64.dmg)
-- [Windows x64 installer](https://github.com/nauticsoftware/NauticMixxx/releases/download/v2.0.0/NauticMixxx-2.0.0-Windows-x64-Setup.exe)
+![NauticMixxx 2.0 PERFORMANCE view with both decks idle](branding/readme/performance-2.0.png)
 
-The Windows installer includes the native NauticMixxx program, RX3 skin, controller mappings and effects. The app and profile are separate from official Mixxx. Uninstall from Windows Settings; personal settings remain in `%LOCALAPPDATA%\NauticMixxx`.
+<sub>PERFORMANCE · macOS capture of the 2.0 interface, with both decks idle.</sub>
 
-On macOS, open the DMG and drag `NauticMixxx.app` to Applications. This build is ad-hoc signed rather than Apple-notarized, so macOS may ask you to confirm its first launch. See the [English installation guide](docs/INSTALLATION-EN.md).
+## New in 2.0
 
-## Verify a download
+**Your controls, together.** UTILITY brings deck, mixer, effects, browser, recording and display settings into one encoder-friendly menu. SHORTCUT keeps frequent adjustments close at hand.
 
-After downloading the release files into one directory, run:
+**Effects with intent.** Four persistent Beat FX favorites, a contextual momentary X-PAD and refined beat/pitch selection. SLIP and active-loop Hot Cue behavior keep performance actions connected to the transport.
 
-```bash
-shasum -a 256 -c SHA256SUMS.txt
-```
+**Preparation that travels.** SOURCE MY SETTINGS, USB appearance preferences and explicit cue, loop, beatgrid, playlist and history saves. USB identity checks, atomic writes and recovery copies protect supported edits.
 
-On Windows, use PowerShell's `Get-FileHash -Algorithm SHA256` and compare the result with `SHA256SUMS.txt`.
+**Playback that stays aware.** Precise imported constant-tempo grids, persistent controller SYNC and cached emergency playback when a playing USB source disappears.
 
-## Test or build
+<details>
+<summary><strong>Explore SHORTCUT and UTILITY</strong></summary>
 
-### Linux and Raspberry Pi
+<br>
 
-A free native build recipe is available for 64-bit Linux. Raspberry Pi 4 with
-64-bit Raspberry Pi OS is an experimental target; physical GPU, audio and
-controller testing is pending. Read the [Linux / Raspberry Pi guide](docs/LINUX-RASPBERRY-PI.md)
-for dependencies, memory settings, troubleshooting and free GitHub Actions builds.
+![SHORTCUT panel in NauticMixxx 2.0](branding/readme/shortcut-2.0.png)
 
-The Linux recipe was validated with version 1.5.0: native builds, RX3 tests and virtual GUI startup passed on
-[Ubuntu 24.04 x86_64 and ARM64](https://github.com/nauticsoftware/NauticMixxx/actions/runs/37158960601)
-and [Debian 12 ARM64](https://github.com/nauticsoftware/NauticMixxx/actions/runs/37159816188).
-The Bookworm build uses Debian's userland; it still needs physical Pi testing.
-No native Linux 2.0.0 package is provided.
+<sub>SHORTCUT · playback, jog response, waveform color and mixer settings.</sub>
 
-```sh
-./scripts/install-linux-build-deps.sh
-RX3_BUILD_JOBS=1 ./scripts/build-mixxx-rx3-linux.sh
-```
+<br><br>
 
-The script downloads the official Mixxx base and applies the NauticMixxx patches.
-Compiling this overlay repository's root directly does not work. Linux artifacts
-are distribution-specific test candidates, rather than universal Pi installers.
+![UTILITY panel in NauticMixxx 2.0](branding/readme/utility-2.0.png)
 
-### macOS and controller tests
+<sub>UTILITY · shared encoder navigation. These two panel images are native UI captures from isolated validation fixtures.</sub>
 
-For a physical Inpulse 500 test, follow the [hardware test guide](docs/HARDWARE_TEST.md). The optional FLX6 browser mapping has been checked in software but has not yet been tested on physical DDJ-FLX6 hardware.
+</details>
 
-To validate the source checkout or build the native macOS app:
+## Plug into your workflow
 
-```bash
-./scripts/validate-release.sh
-./scripts/build-mixxx-rx3-macos.sh
-```
+Prepare and export your USB in rekordbox, open NauticMixxx, then browse and load from SOURCE. The app reads exported USB libraries; its local-folder scanner is disabled.
 
-The `patches/` directory contains changes against Mixxx 2.5.6. `controllers/`, `effects/`, `skins/` and `profile/` hold the NauticMixxx components; `scripts/` and `packaging/` contain build and release tooling. Downloadable binaries, the manifest and checksums are attached to [GitHub Releases](https://github.com/nauticsoftware/NauticMixxx/releases).
+The dedicated **Hercules DJControl Inpulse 500** mapping is joined by RX3 presets for **DDJ-FLX4, DDJ-400, DDJ-SX / SX2 / SX3, DDJ-WeGO3 and Roland DJ-505**. DDJ-FLX6 has an optional browser-only adapter. Read the [controller guide](docs/CONTROLLERS-RX3-1.5-EN.md) for each mapping's scope.
 
-More documentation: [validation](docs/VALIDATION-1.1.md), [architecture](docs/ARCHITECTURE.md), [changelog](CHANGELOG.md), [contributing](CONTRIBUTING.md) and [release process](docs/RELEASING.md).
+Physical controller and RX3 audio calibration remain pending. Link Export, registered MATCHING pairs and the complete RX3 effect catalogs are unfinished; the [workflow guide](docs/RX3-WORKFLOW-2.0-EN.md) records the current scope.
 
-## License and trademarks
+## Open source, verifiable releases
 
-NauticMixxx components are released under GNU GPL v3. The Mixxx engine retains its GNU GPL v2-or-later terms and notices. See [LICENSE.md](LICENSE.md) and [third-party notices](THIRD_PARTY_NOTICES.md). NauticMixxx is not an official product of, or affiliated with, the trademark owners named in the [trademark notice](TRADEMARKS.md).
+The release includes corresponding source, a package manifest, signed update feeds and [SHA-256 checksums](https://github.com/nauticsoftware/NauticMixxx/releases/download/v2.0.0/SHA256SUMS.txt). macOS and Windows native regression tests passed; Windows installation, upgrade and uninstallation were checked in [CI](https://github.com/nauticsoftware/NauticMixxx/actions/runs/38434558661). See the [test report](TEST_REPORT.md).
+
+[Build instructions](docs/BUILDING.md) · [Linux / Raspberry Pi experiments](docs/LINUX-RASPBERRY-PI.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/nauticsoftware/NauticMixxx/issues)
+
+---
+
+<sub>NauticMixxx is a community edition built on Mixxx 2.5.6. NauticMixxx components use GPL v3; the Mixxx engine retains GPL v2-or-later terms. [License](LICENSE.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Trademarks](TRADEMARKS.md). Independent from the hardware and software trademark owners named in those notices.</sub>

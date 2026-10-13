@@ -268,6 +268,7 @@ def create_source_archive(output: Path) -> None:
             add_tree(archive, ROOT / script, f"{prefix}/{script}")
         for name in ["NauticMixxx.png", "NauticMixxx2.png"]:
             add_tree(archive, ROOT / "branding" / name, f"{prefix}/branding/{name}")
+        add_tree(archive, ROOT / "branding/readme", f"{prefix}/branding/readme")
         add_tree(archive, ROOT / "branding/iCon.icon", f"{prefix}/branding/iCon.icon")
         add_tree(archive, ROOT / ".github", f"{prefix}/.github")
         add_tree(archive, ROOT / ".gitattributes", f"{prefix}/.gitattributes")
@@ -302,6 +303,7 @@ def create_github_source_zip(output: Path) -> None:
         "branding/NauticMixxx2.png",
         "branding/NauticMixxx_Home.png",
         "branding/NauticMixxx_Performance.png",
+        "branding/readme",
         "README.md",
         "RELEASE_NOTES.md",
         "SECURITY.md",

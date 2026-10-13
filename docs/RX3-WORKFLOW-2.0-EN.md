@@ -158,10 +158,10 @@ profile remains available. Advanced frequency-selective talkover is unfinished.
   setup through the encoder remain unfinished.
 - Physical pad/LED/audio calibration, alternate controller performance-mode
   bridges, recorder interruption/recovery, rekordbox cue/grid/history/playlist
-  round-trips and MSVC execution are pending.
+  round-trips are pending. Native MSVC compilation and Windows installer validation passed in the 2.0.0 publication CI.
 - Tests against a real USB export read the original; writer tests use isolated
-  copies. No hardware RX3 equivalence or packaged candidate is certified by the
-  current source tests.
+  copies. Software checks validate the macOS/Windows packages; they do not certify
+  hardware RX3 equivalence.
 
 ## References
 

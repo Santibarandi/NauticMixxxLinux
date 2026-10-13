@@ -840,5 +840,8 @@ Evidence: `build/test-candidate/macos/validation/emergency-*.log`, `patch-apply.
 - Cross-platform native regression selection: 264 passed, nine optional fixture checks skipped, zero failures.
 - Public source/privacy audit, XML/controller checks, Windows installer/macro contract, VIEW, transport release, SYNC and flattened controller-package checks passed.
 - Publication uses a clean installed bundle with canonical branding, rather than an isolated test profile.
-- Native Windows compilation, installer/upgrade/uninstall results and final package verification are recorded below when completed.
+- Native Windows x64 validation passed 264 tests with nine optional fixture skips and zero failures. The actual EXE installation, integrated upgrade and uninstallation passed, with user profile preservation. CI: https://github.com/nauticsoftware/NauticMixxx/actions/runs/38434558661
+- All seven icon frames in the Windows installer, app and update helper match the canonical NauticMixxx ICO. The packaged executable and all 44 patch hashes match the CI build record.
+- The 44-patch chain applies cleanly to Mixxx 2.5.6 and reproduces all 259 affected source paths. MY SETTINGS validation read handles are closed before Windows atomic replacement and rollback.
+- Final native macOS release and cross-platform regression selections passed after this correction. Strict/deep signing, DMG verification and canonical icon/Finder checks are retained with the publication evidence.
 - Physical controller, RX3 audio calibration and real rekordbox writeback round-trips remain pending.
