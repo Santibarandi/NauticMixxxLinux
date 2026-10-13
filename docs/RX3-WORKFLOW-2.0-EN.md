@@ -1,7 +1,7 @@
 # RX3 workflow implementation in NauticMixxx 2.0.0
 
-This document describes the development source included in test candidate
-`2.0.0-rx3-workflows-1`.
+This document describes the RX3 workflows included in the public 2.0.0 release.
+UTILITY integrates the former TOOLS operations; see the [UTILITY guide](UTILITY-2.0-EN.md).
 The user's working Hercules Inpulse 500 gestures are the baseline. The complete
 14 Beat FX and six Sound Color FX remain explicitly deferred. Release FX are a
 separate performance-pad feature included in this work.

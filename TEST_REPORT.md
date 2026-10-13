@@ -831,3 +831,14 @@ Evidence: `build/test-candidate/macos/validation/emergency-*.log`, `patch-apply.
 - Native macOS arm64 application/test builds passed. All 16 dedicated Beat FX regressions passed, including readout/controller updates and resize persistence with rich-text unit suffixes. The broader RX3/WidgetStack suite passed 120 tests, with four optional fixture skips and zero failures. Evidence: `build/test-candidate/macos/validation/beatfx-panel-reference-{build,tests,regression}.log` and XML results.
 - Visually inspected the Qt preview assembled from the actual `beffect.xml`, stylesheet and native label/number/selector/group widgets, with illustrative button states: `build/test-candidate/macos/validation/beatfx-panel-reference-renders/beatfx-panel.png`. This is an isolated sidebar fixture, not a live full-application capture. The fixture also records dimensions in `beatfx-panel-reference-layout.json`; appearance on the user's live display remains pending.
 - Patch 0035 applies cleanly and reproduces all seven native source files exactly. Public release audit, Windows installer contract and whitespace checks passed. Windows native compilation remains pending. No new candidate or release package was generated; reopen the existing source-test launcher.
+
+
+### Public 2.0.0 validation — 2026-10-13
+
+- Current native macOS arm64 application and test targets built successfully.
+- Release regression suite: 236 passed, 16 optional fixture checks skipped, zero failures.
+- Cross-platform native regression selection: 264 passed, nine optional fixture checks skipped, zero failures.
+- Public source/privacy audit, XML/controller checks, Windows installer/macro contract, VIEW, transport release, SYNC and flattened controller-package checks passed.
+- Publication uses a clean installed bundle with canonical branding, rather than an isolated test profile.
+- Native Windows compilation, installer/upgrade/uninstall results and final package verification are recorded below when completed.
+- Physical controller, RX3 audio calibration and real rekordbox writeback round-trips remain pending.
