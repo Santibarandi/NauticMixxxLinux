@@ -35,6 +35,8 @@ fi
 if [ "$(cat "$marker")" != "$digest" ] || [ ! -f "$source_tree/src/test/trackcapabilitypolicy_test.cpp" ]; then
   printf 'Source patches changed; choose a fresh RX3_BUILD_ROOT.\n' >&2; exit 1
 fi
+# Fix: wwaveformviewer.cpp lacks the ControlObject include (precompiled headers are disabled)
+grep -q 'control/controlobject.h' "$source_tree/src/widget/wwaveformviewer.cpp" || sed -i '1i #include "control/controlobject.h"' "$source_tree/src/widget/wwaveformviewer.cpp"
 # Branding must be applied before Qt compiles its resource collection.
 python3 "$project/packaging/linux/prepare-branding.py" "$source_tree" "$project"
 cmake -S "$source_tree" -B "$work/native" -G Ninja \
